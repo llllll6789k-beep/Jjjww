@@ -1,0 +1,3035 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#6D28D9" />
+  <title>لمّة بلاي - LAMMA PLAY | منصة ألعاب عائلية وجماعية</title>
+  <!-- تحميل مكتبة Tailwind CSS للواجهة المتجاوبة -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- تحميل خط القاهرة العربي بوضوح عالٍ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* متغيرات الهوية البصرية بأسلوب سين جيم */
+    :root {
+      --primary: #6D28D9;
+      --primary-dark: #4C1D95;
+      --accent: #F59E0B;
+      --accent-dark: #B45309;
+      --teal: #0D9488;
+      --teal-dark: #115E59;
+      --rose: #E11D48;
+      --rose-dark: #9F1239;
+      --bg: #F8FAFC;
+      --card: #FFFFFF;
+      --ink: #0F172A;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: var(--ink);
+      margin: 0;
+      padding-bottom: 92px;
+      overflow-x: hidden;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding-bottom: 32px;
+      }
+    }
+
+    /* أزرار مجسمة ثلاثية الأبعاد تفاعلية */
+    .btn-3d {
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
+      position: relative;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .btn-3d:active {
+      transform: translateY(4px);
+    }
+
+    .btn-purple {
+      background: linear-gradient(180deg, #8B5CF6 0%, #6D28D9 100%);
+      color: #FFFFFF;
+      box-shadow: 0 5px 0 #4C1D95, 0 10px 20px rgba(109, 40, 217, 0.25);
+    }
+    .btn-purple:active { box-shadow: 0 1px 0 #4C1D95; }
+
+    .btn-amber {
+      background: linear-gradient(180deg, #FBBF24 0%, #F59E0B 100%);
+      color: #1E1B4B;
+      box-shadow: 0 5px 0 #B45309, 0 10px 20px rgba(245, 158, 11, 0.25);
+    }
+    .btn-amber:active { box-shadow: 0 1px 0 #B45309; }
+
+    .btn-teal {
+      background: linear-gradient(180deg, #14B8A6 0%, #0D9488 100%);
+      color: #FFFFFF;
+      box-shadow: 0 5px 0 #115E59, 0 10px 20px rgba(13, 148, 136, 0.25);
+    }
+    .btn-teal:active { box-shadow: 0 1px 0 #115E59; }
+
+    .btn-rose {
+      background: linear-gradient(180deg, #F43F5E 0%, #E11D48 100%);
+      color: #FFFFFF;
+      box-shadow: 0 5px 0 #9F1239, 0 10px 20px rgba(225, 29, 72, 0.25);
+    }
+    .btn-rose:active { box-shadow: 0 1px 0 #9F1239; }
+
+    .btn-white {
+      background: #FFFFFF;
+      color: #1E293B;
+      border: 2px solid #E2E8F0;
+      box-shadow: 0 4px 0 #CBD5E1;
+    }
+    .btn-white:active { box-shadow: 0 1px 0 #CBD5E1; }
+
+    /* بطاقات المنصة بأسلوب سين جيم */
+    .card-sj {
+      background: #FFFFFF;
+      border: 2px solid #E2E8F0;
+      box-shadow: 0 6px 0 #E2E8F0, 0 12px 24px rgba(15, 23, 42, 0.05);
+      border-radius: 1.5rem;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card-sj:hover {
+      border-color: #C4B5FD;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* لوحة الرسم التفاعلية للعبة ارسم وخمّن */
+    canvas#drawCanvas {
+      touch-action: none;
+      background: #FFFFFF;
+      border: 3px solid #CBD5E1;
+      border-radius: 1.25rem;
+      cursor: crosshair;
+      display: block;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <!-- شريط حالة الاتصال بالإنترنت ووضع Offline وتثبيت PWA -->
+  <div id="statusBanner" class="bg-slate-900 text-white text-xs sm:text-sm py-2 px-4 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50 border-b border-slate-700">
+    <div class="flex items-center gap-2">
+      <span id="netDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
+      <span id="netLabel" class="font-bold">متصل بالإنترنت • الألعاب محفوظة للعمل Offline</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="App.toggleOfflineSim()" id="offlineSimBtn" class="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-600 px-2.5 py-1 rounded-lg font-bold text-xs">
+        محاكاة وضع Offline
+      </button>
+      <button onclick="App.triggerPWAInstall()" id="pwaInstallBtn" class="bg-purple-600 hover:bg-purple-500 text-white px-2.5 py-1 rounded-lg font-bold text-xs">
+        📲 تثبيت التطبيق PWA
+      </button>
+    </div>
+  </div>
+
+  <!-- شريط التنقل العلوي والهيدر -->
+  <header class="bg-white/95 backdrop-blur border-b-2 border-slate-200 sticky top-[37px] z-40">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+      <!-- شعار المنصة -->
+      <button onclick="App.navigate('home')" class="flex items-center gap-2.5 text-right focus:outline-none">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center text-white text-2xl shadow-md border-b-4 border-purple-950">
+          🎲
+        </div>
+        <div>
+          <div id="brandNameHeader" class="font-black text-lg sm:text-xl text-purple-900 leading-none">لمّة بلاي</div>
+          <div class="text-[11px] font-bold text-amber-600 tracking-wider">LAMMA PLAY</div>
+        </div>
+      </button>
+
+      <!-- روابط التنقل في شاشات الكمبيوتر -->
+      <nav class="hidden md:flex items-center gap-1.5">
+        <button data-nav="home" onclick="App.navigate('home')" class="nav-link px-3.5 py-2 rounded-xl font-extrabold text-sm transition">🏠 الرئيسية</button>
+        <button data-nav="games" onclick="App.navigate('games')" class="nav-link px-3.5 py-2 rounded-xl font-extrabold text-sm transition">🎮 الألعاب (30)</button>
+        <button data-nav="plans" onclick="App.navigate('plans')" class="nav-link px-3.5 py-2 rounded-xl font-extrabold text-sm transition">💎 الاشتراكات</button>
+        <button data-nav="account" onclick="App.navigate('account')" class="nav-link px-3.5 py-2 rounded-xl font-extrabold text-sm transition">👤 حسابي</button>
+        <button data-nav="about" onclick="App.navigate('about')" class="nav-link px-3.5 py-2 rounded-xl font-extrabold text-sm transition">ℹ️ من نحن</button>
+        <button id="adminDesktopBtn" data-nav="admin" onclick="App.navigate('admin')" class="hidden nav-link px-3.5 py-2 rounded-xl font-extrabold text-sm bg-rose-100 text-rose-800 border border-rose-300">🛡️ لوحة الإدارة</button>
+      </nav>
+
+      <!-- منطقة الحساب السريع في الهيدر -->
+      <div id="headerUserArea" class="flex items-center gap-2"></div>
+    </div>
+  </header>
+
+  <!-- المحتوى الرئيسي الديناميكي -->
+  <main id="appMain" class="max-w-7xl mx-auto px-4 pt-6 pb-8"></main>
+
+  <!-- التذييل الكامل مع الصفحات القانونية -->
+  <footer class="bg-slate-900 text-slate-300 mt-12 border-t-4 border-purple-600">
+    <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-2xl">🎲</span>
+          <span id="brandNameFooter" class="font-black text-xl text-white">لمّة بلاي - LAMMA PLAY</span>
+        </div>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          منصة ألعاب عائلية واجتماعية تجمع العيلة والأصحاب على جهاز واحد فقط وبدون إنترنت بعد تفعيل الاشتراك.
+        </p>
+      </div>
+      <div>
+        <h4 class="font-black text-white mb-3">روابط سريعة</h4>
+        <ul class="space-y-2 text-sm font-bold">
+          <li><button onclick="App.navigate('home')" class="hover:text-amber-400">الرئيسية</button></li>
+          <li><button onclick="App.navigate('games')" class="hover:text-amber-400">مكتبة الـ 30 لعبة</button></li>
+          <li><button onclick="App.navigate('plans')" class="hover:text-amber-400">باقات الاشتراك</button></li>
+          <li><button onclick="App.navigate('about')" class="hover:text-amber-400">من نحن</button></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-black text-white mb-3">الصفحات القانونية والتواصل</h4>
+        <ul class="space-y-2 text-sm font-bold">
+          <li><button onclick="App.navigate('legal-terms')" class="hover:text-amber-400">الشروط والأحكام</button></li>
+          <li><button onclick="App.navigate('legal-privacy')" class="hover:text-amber-400">سياسة الخصوصية</button></li>
+          <li><button onclick="App.navigate('legal-refund')" class="hover:text-amber-400">سياسة الاشتراكات والاسترداد</button></li>
+          <li><button onclick="App.navigate('contact')" class="hover:text-amber-400">اتصل بنا</button></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-black text-white mb-3">نظام اللعب الأساسي</h4>
+        <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 text-xs space-y-1.5 text-slate-300 font-bold">
+          <div>📱 جهاز واحد فقط بالتناوب (Pass & Play)</div>
+          <div>✈️ يعمل Offline بالكامل بعد التحميل</div>
+          <div>💳 اشتراك موحد عبر فودافون كاش</div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center text-xs text-slate-500 py-4 border-t border-slate-800 font-bold">
+      © 2026 لمّة بلاي LAMMA PLAY — جميع الحقوق محفوظة
+    </div>
+  </footer>
+
+  <!-- شريط التنقل السفلي للهواتف (4 أقسام رئيسية) -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t-2 border-slate-200 z-40 grid grid-cols-4 h-16 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+    <button data-nav="home" onclick="App.navigate('home')" class="mob-nav flex flex-col items-center justify-center gap-0.5 text-xs font-extrabold text-slate-600">
+      <span class="text-lg">🏠</span>
+      <span>الرئيسية</span>
+    </button>
+    <button data-nav="games" onclick="App.navigate('games')" class="mob-nav flex flex-col items-center justify-center gap-0.5 text-xs font-extrabold text-slate-600">
+      <span class="text-lg">🎮</span>
+      <span>الألعاب</span>
+    </button>
+    <button data-nav="account" onclick="App.navigate('account')" class="mob-nav flex flex-col items-center justify-center gap-0.5 text-xs font-extrabold text-slate-600">
+      <span class="text-lg">👤</span>
+      <span>حسابي</span>
+    </button>
+    <button data-nav="about" onclick="App.navigate('about')" class="mob-nav flex flex-col items-center justify-center gap-0.5 text-xs font-extrabold text-slate-600">
+      <span class="text-lg">ℹ️</span>
+      <span>من نحن</span>
+    </button>
+  </nav>
+
+  <!-- حاوية النوافذ المنبثقة (Modals) للألعاب والدفع والحسابات -->
+  <div id="modalContainer" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div id="modalBox" class="bg-white rounded-3xl max-w-2xl w-full p-6 border-2 border-slate-200 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto"></div>
+  </div>
+
+  <!-- حاوية التنبيهات الفورية غير المزعجة (Toast) -->
+  <div id="toastBox" class="fixed top-20 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 pointer-events-none w-[92%] max-w-md"></div>
+
+  <script>
+    /* =====================================================================
+       1. طبقة قاعدة البيانات والتخزين المحلي (LocalStorage + IndexedDB)
+       ===================================================================== */
+    const DB = {
+      KEY: 'lamma_play_complete_v1',
+      IDB_NAME: 'LammaPlayIDB',
+      IDB_STORE: 'receipts_store',
+      idb: null,
+
+      // تهيئة IndexedDB لتخزين صور إثبات التحويل محلياً بكفاءة
+      async initIDB() {
+        return new Promise((resolve) => {
+          try {
+            if (!window.indexedDB) return resolve(null);
+            const req = indexedDB.open(this.IDB_NAME, 1);
+            req.onupgradeneeded = (e) => {
+              const db = e.target.result;
+              if (!db.objectStoreNames.contains(this.IDB_STORE)) {
+                db.createObjectStore(this.IDB_STORE);
+              }
+            };
+            req.onsuccess = (e) => {
+              this.idb = e.target.result;
+              resolve(this.idb);
+            };
+            req.onerror = () => resolve(null);
+          } catch (_) {
+            resolve(null);
+          }
+        });
+      },
+
+      async saveReceiptBlob(orderId, dataUrl) {
+        if (!this.idb) return false;
+        return new Promise((resolve) => {
+          try {
+            const tx = this.idb.transaction(this.IDB_STORE, 'readwrite');
+            tx.objectStore(this.IDB_STORE).put(dataUrl, 'receipt_' + orderId);
+            tx.oncomplete = () => resolve(true);
+            tx.onerror = () => resolve(false);
+          } catch (_) {
+            resolve(false);
+          }
+        });
+      },
+
+      // البيانات الافتراضية للمنصة والباقات والحسابات والألعاب الـ 30
+      getDefaultState() {
+        const now = new Date();
+        const nextMonth = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+        return {
+          siteSettings: {
+            platformName: 'لمّة بلاي - LAMMA PLAY',
+            maintenanceMode: false,
+            contactEmail: 'support@lamma.play',
+            contactNote: 'فريق الدعم متاح يومياً لمساعدتكم في الاشتراكات والاستفسارات.'
+          },
+          paymentSettings: {
+            // يُضبط من لوحة الإدارة دون وضع رقم وهمي داخل الموقع
+            vodafoneCashNumber: '',
+            instructions: 'حوّل قيمة الباقة إلى رقم فودافون كاش الخاص بالمنصة، ثم ارفع صورة واضحة لإيصال التحويل مع رقم الهاتف المحوّل منه ومرجع العملية.',
+            maxImageSizeMB: 5
+          },
+          plans: [
+            {
+              id: 'plan_1m',
+              name: 'الباقة الشهرية',
+              durationDays: 30,
+              price: 79,
+              active: true,
+              badge: 'بداية مثالية',
+              features: [
+                'فتح جميع الألعاب الـ 30 فوراً',
+                'تشغيل الألعاب بدون إنترنت Offline',
+                'لعب جماعي من 2 إلى 8 لاعبين على جهاز واحد',
+                'تحديثات الأسئلة والقضايا والتحديات'
+              ]
+            },
+            {
+              id: 'plan_3m',
+              name: 'باقة اللمة (3 أشهر)',
+              durationDays: 90,
+              price: 199,
+              active: true,
+              badge: 'الأكثر توفيراً 🔥',
+              features: [
+                'فتح جميع الألعاب الـ 30 فوراً',
+                'توفير ممتاز مقارنة بالاشتراك الشهري',
+                'مثالية للسهرات العائلية والسفر Offline',
+                'سجل نقاط وإنجازات وشارات متكامل'
+              ]
+            },
+            {
+              id: 'plan_1y',
+              name: 'الباقة السنوية VIP',
+              durationDays: 365,
+              price: 599,
+              active: true,
+              badge: 'أفضل قيمة للعائلة 👑',
+              features: [
+                'سنة كاملة من المرح العائلي المتواصل',
+                'أعلى نسبة توفير للأسرة والشلة',
+                'فتح جميع الألعاب والتحديثات الدورية',
+                'شارة VIP مميزة في صفحة حسابي'
+              ]
+            }
+          ],
+          users: [
+            {
+              id: 'u_admin',
+              name: 'مدير المنصة',
+              email: 'admin@lamma.play',
+              passwordHash: 'Admin1234',
+              role: 'admin',
+              avatar: '🛡️',
+              city: 'القاهرة',
+              createdAt: '2026-01-01',
+              banned: false,
+              subscription: {
+                status: 'active',
+                planName: 'صلاحية إدارية',
+                startDate: '2026-01-01',
+                endDate: '2099-12-31'
+              },
+              stats: {
+                points: 4500,
+                wins: 30,
+                playedGames: ['g1', 'g2', 'g3', 'g5'],
+                achievements: ['مؤسس اللمة', 'خبير الألغاز']
+              }
+            },
+            {
+              id: 'u_demo',
+              name: 'عائلة أحمد',
+              email: 'user@lamma.play',
+              passwordHash: '123456',
+              role: 'subscriber',
+              avatar: '🦁',
+              city: 'الإسكندرية',
+              createdAt: '2026-02-10',
+              banned: false,
+              subscription: {
+                status: 'active',
+                planName: 'الباقة الشهرية',
+                startDate: now.toISOString().split('T')[0],
+                endDate: nextMonth.toISOString().split('T')[0]
+              },
+              stats: {
+                points: 1950,
+                wins: 14,
+                playedGames: ['g1', 'g2', 'g3', 'g6'],
+                achievements: ['بطل المسابقات', 'المحقق الذكي']
+              }
+            }
+          ],
+          currentUserId: null,
+          paymentRequests: [],
+          adminLogs: [
+            {
+              id: 'log_init',
+              action: 'تهيئة قاعدة البيانات والمنصة',
+              adminName: 'النظام',
+              date: now.toLocaleString('ar-EG')
+            }
+          ],
+          games: this.getInitial30Games(),
+          contentBank: this.getInitialContentBank()
+        };
+      },
+
+      // قائمة الألعاب الـ 30 كاملة ومصنفة
+      getInitial30Games() {
+        return [
+          { id: 'g1', title: 'مملكة الأسئلة', category: 'مسابقات', players: '2 - 8 لاعبين', duration: '10 د', difficulty: 'متوسط', icon: '👑', color: 'from-purple-600 to-indigo-600', plays: 342, active: true, popular: true, desc: 'مسابقة ثقافية ورياضية وتاريخية وعلمية وأفلام عائلية بأربع اختيارات ومؤقت ومكافأة سرعة.' },
+          { id: 'g2', title: 'مين الكذاب؟', category: 'ألعاب ضحك وتسلية', players: '3 - 8 لاعبين', duration: '8 د', difficulty: 'سهل', icon: '🕵️‍♂️', color: 'from-rose-500 to-orange-500', plays: 410, active: true, popular: true, desc: 'مرر الجهاز بسرية تامة! الجميع يعرف الكلمة السرية إلا الكذاب الذي يحاول التمويه ثم التصويت.' },
+          { id: 'g3', title: 'ارسم وخمّن', category: 'ألعاب ضحك وتسلية', players: '2 - 8 لاعبين', duration: '12 د', difficulty: 'سهل', icon: '🎨', color: 'from-amber-500 to-yellow-500', plays: 295, active: true, popular: true, desc: 'لوحة رسم كاملة باللمس والماوس مع ألوان وممحاة وتراجع ومسح ليخمن الباقون الكلمة.' },
+          { id: 'g4', title: 'تحدي الكلمات', category: 'ذكاء وألغاز', players: '2 - 8 لاعبين', duration: '7 د', difficulty: 'متوسط', icon: '🔤', color: 'from-emerald-500 to-teal-600', plays: 215, active: true, popular: false, desc: 'كوّن أكبر عدد من الكلمات العربية الصحيحة من الحروف العشوائية مع منع التكرار واحتساب النقاط.' },
+          { id: 'g5', title: 'المحققون', category: 'تحقيق وغموض', players: '2 - 6 لاعبين', duration: '15 د', difficulty: 'صعب', icon: '🔍', color: 'from-slate-700 to-slate-900', plays: 268, active: true, popular: true, desc: 'قضايا غامضة ومشتبه بهم وأدلة مخفية واستجوابات لكشف الجاني الحقيقي معاً.' },
+          { id: 'g6', title: 'تحدي الذاكرة', category: 'ذكاء وألغاز', players: '2 - 6 لاعبين', duration: '6 د', difficulty: 'سهل', icon: '🧠', color: 'from-cyan-500 to-blue-600', plays: 190, active: true, popular: false, desc: 'اقلب البطاقات المخفية بالتناوب وطابق الرموز المتشابهة واجمع النقاط.' },
+          { id: 'g7', title: 'حرب العقول', category: 'ألعاب استراتيجية', players: '2 - 4 لاعبين', duration: '15 د', difficulty: 'صعب', icon: '🏰', color: 'from-indigo-600 to-blue-800', plays: 154, active: true, popular: false, desc: 'خريطة استراتيجية سلمية لإدارة الموارد وبناء المعالم وتطوير المناطق وجمع النقاط.' },
+          { id: 'g8', title: 'من أنا؟', category: 'ألعاب ضحك وتسلية', players: '2 - 8 لاعبين', duration: '10 د', difficulty: 'سهل', icon: '🎭', color: 'from-fuchsia-600 to-pink-600', plays: 280, active: true, popular: true, desc: 'يرفع اللاعب الجهاز ليرى الجميع شخصيته أو حيوانه السري ويسأل أسئلة إجابتها نعم أو لا.' },
+          { id: 'g9', title: 'تحدي السرعة', category: 'تحديات', players: '2 - 8 لاعبين', duration: '5 د', difficulty: 'سهل', icon: '⚡', color: 'from-orange-500 to-red-600', plays: 230, active: true, popular: false, desc: 'جولات خاطفة لاختبار رد الفعل والملاحظة والتركيز وتحديد أسرع لاعب في اللمة.' },
+          { id: 'g10', title: 'المغامرة الجماعية', category: 'ألعاب استراتيجية', players: '2 - 4 لاعبين', duration: '15 د', difficulty: 'متوسط', icon: '🗺️', color: 'from-teal-600 to-emerald-700', plays: 175, active: true, popular: false, desc: 'تعاونوا معاً عبر مراحل متدرجة لفتح الأبواب وحل الألغاز والوصول إلى النهاية.' },
+          { id: 'g11', title: 'أكمل المثل الشعبي', category: 'مسابقات', players: '2 - 8 لاعبين', duration: '8 د', difficulty: 'سهل', icon: '📜', color: 'from-amber-600 to-orange-700', plays: 162, active: true, popular: false, desc: 'اختبر خبرتك في الأمثال العربية والمصرية الشهيرة وأكمل النصف الناقص.' },
+          { id: 'g12', title: 'فوازير العيلة', category: 'ذكاء وألغاز', players: '2 - 8 لاعبين', duration: '10 د', difficulty: 'متوسط', icon: '💡', color: 'from-yellow-500 to-amber-600', plays: 188, active: true, popular: false, desc: 'ألغاز ذكية وفوازير ممتعة تناسب الصغار والكبار في أجواء تنافسية مرحة.' },
+          { id: 'g13', title: 'خمن السعر أو الرقم', category: 'مسابقات', players: '2 - 8 لاعبين', duration: '8 د', difficulty: 'متوسط', icon: '🔢', color: 'from-blue-600 to-indigo-700', plays: 141, active: true, popular: false, desc: 'من هو الأقرب للرقم الصحيح؟ تقديرات لأطوال وأعداد وتواريخ حقيقية.' },
+          { id: 'g14', title: 'صح ولا غلط السريع', category: 'تحديات', players: '2 - 8 لاعبين', duration: '5 د', difficulty: 'سهل', icon: '✅', color: 'from-green-500 to-emerald-600', plays: 199, active: true, popular: false, desc: 'معلومات مدهشة وغريبة.. قرر في ثوانٍ هل المعلومة صحيحة أم خاطئة!' },
+          { id: 'g15', title: 'عجلة الحظ العائلية', category: 'ألعاب ضحك وتسلية', players: '2 - 8 لاعبين', duration: '10 د', difficulty: 'سهل', icon: '🎡', color: 'from-pink-500 to-rose-600', plays: 245, active: true, popular: true, desc: 'أدر العجلة واكسب النقاط أو نفّذ التحديات العائلية الخفيفة.' },
+          { id: 'g16', title: 'شيفرة الألوان', category: 'ذكاء وألغاز', players: '2 - 6 لاعبين', duration: '8 د', difficulty: 'صعب', icon: '🎯', color: 'from-violet-600 to-purple-800', plays: 112, active: true, popular: false, desc: 'اكتشف الترتيب السري للألوان الأربعة بأقل عدد ممكن من المحاولات.' },
+          { id: 'g17', title: 'حساب ذهني خاطف', category: 'تحديات', players: '2 - 8 لاعبين', duration: '6 د', difficulty: 'متوسط', icon: '🧮', color: 'from-sky-500 to-blue-700', plays: 134, active: true, popular: false, desc: 'عمليات حسابية سريعة تنشط الذهن وتكافئ صاحب الإجابة الصحيحة.' },
+          { id: 'g18', title: 'مين قالها؟', category: 'مسابقات', players: '2 - 8 لاعبين', duration: '9 د', difficulty: 'متوسط', icon: '💬', color: 'from-purple-500 to-pink-600', plays: 129, active: true, popular: false, desc: 'مقولات شهيرة من التاريخ والأفلام العائلية.. من قائلها؟' },
+          { id: 'g19', title: 'كرسي الاعتراف المرح', category: 'ألعاب ضحك وتسلية', players: '3 - 8 لاعبين', duration: '12 د', difficulty: 'سهل', icon: '🪑', color: 'from-rose-600 to-pink-700', plays: 210, active: true, popular: false, desc: 'أسئلة مواقف عائلية طريفة ومهذبة تقرّب الأصدقاء والعائلة.' },
+          { id: 'g20', title: 'قنبلة الأسئلة', category: 'تحديات', players: '3 - 8 لاعبين', duration: '7 د', difficulty: 'سهل', icon: '💣', color: 'from-red-600 to-orange-600', plays: 224, active: true, popular: false, desc: 'أجب بسرعة ومرّر الجهاز للي جنبك قبل انتهاء التحدي السريع!' },
+          { id: 'g21', title: 'الرابط العجيب', category: 'ذكاء وألغاز', players: '2 - 8 لاعبين', duration: '9 د', difficulty: 'متوسط', icon: '🔗', color: 'from-teal-500 to-cyan-600', plays: 147, active: true, popular: false, desc: 'ثلاث كلمات تبدو مختلفة.. ما هو الشيء المشترك الذي يجمع بينها؟' },
+          { id: 'g22', title: 'عواصم ومعالم', category: 'مسابقات', players: '2 - 8 لاعبين', duration: '8 د', difficulty: 'سهل', icon: '🌍', color: 'from-blue-500 to-teal-500', plays: 165, active: true, popular: false, desc: 'رحلة حول العالم لاختبار معلوماتك في الدول والعواصم وأشهر المعالم.' },
+          { id: 'g23', title: 'مبارزة الألوان', category: 'تحديات', players: '2 - 8 لاعبين', duration: '5 د', difficulty: 'صعب', icon: '🌈', color: 'from-indigo-500 to-purple-600', plays: 158, active: true, popular: false, desc: 'لا تقرأ الكلمة.. اختر لون الخط المكتوب به الكلمة قبل أن يخدعك عقلك!' },
+          { id: 'g24', title: 'حروف وأسماء', category: 'مسابقات', players: '2 - 8 لاعبين', duration: '12 د', difficulty: 'متوسط', icon: '🚌', color: 'from-amber-500 to-red-500', plays: 276, active: true, popular: true, desc: 'ولد، بنت، حيوان، جماد، وبلاد بنفس الحرف.. من يسبق ويعلن التوقف؟' },
+          { id: 'g25', title: 'مكتشف الدخيل', category: 'ذكاء وألغاز', players: '2 - 8 لاعبين', duration: '7 د', difficulty: 'سهل', icon: '🔎', color: 'from-emerald-600 to-green-700', plays: 139, active: true, popular: false, desc: 'أربع كلمات في المجموعة.. واحدة فقط لا تنتمي للبقية، اكتشفها بسرعة.' },
+          { id: 'g26', title: 'لغز الغرفة المغلقة', category: 'تحقيق وغموض', players: '2 - 6 لاعبين', duration: '14 د', difficulty: 'صعب', icon: '🔐', color: 'from-slate-800 to-indigo-950', plays: 171, active: true, popular: false, desc: 'اجمعوا القرائن والأدلة لحل اللغز وكشف الحقيقة في الوقت المحدد.' },
+          { id: 'g27', title: 'تحدي التمثيل الصامت', category: 'ألعاب ضحك وتسلية', players: '4 - 8 لاعبين', duration: '12 د', difficulty: 'سهل', icon: '🤐', color: 'from-pink-600 to-purple-700', plays: 203, active: true, popular: false, desc: 'مثّل الكلمة بدون أي صوت ليفهمها الباقون في اللمة.' },
+          { id: 'g28', title: 'سباق القوافل', category: 'ألعاب استراتيجية', players: '2 - 4 لاعبين', duration: '12 د', difficulty: 'متوسط', icon: '🐪', color: 'from-yellow-600 to-amber-800', plays: 118, active: true, popular: false, desc: 'خطط لمسار قافلتك واجمع الموارد والنقاط للوصول إلى الصدارة.' },
+          { id: 'g29', title: 'ذاكرة الأرقام المتسلسلة', category: 'ذكاء وألغاز', players: '2 - 6 لاعبين', duration: '6 د', difficulty: 'صعب', icon: '🔢', color: 'from-cyan-600 to-slate-800', plays: 121, active: true, popular: false, desc: 'احفظ تسلسل الأرقام وأعد إدخاله بدقة لاختبار قوة الذاكرة البصرية.' },
+          { id: 'g30', title: 'بطولة أبطال اللمة الكبرى', category: 'مسابقات', players: '2 - 8 لاعبين', duration: '15 د', difficulty: 'متوسط', icon: '🏆', color: 'from-amber-400 via-orange-500 to-rose-600', plays: 312, active: true, popular: true, desc: 'تحدي شامل يجمع أسئلة متنوعة ومكافآت سرعة لتتويج بطل السهرة.' }
+        ];
+      },
+
+      // بنك الأسئلة والقضايا والمحتوى الموسع
+      getInitialContentBank() {
+        return {
+          quiz: [
+            { cat: 'ثقافة عامة', q: 'ما هو أكبر محيط في العالم من حيث المساحة؟', opts: ['المحيط الأطلسي', 'المحيط الهادئ', 'المحيط الهندي', 'المحيط المتجمد'], ans: 1 },
+            { cat: 'علوم', q: 'ما هو الغاز الأكثر وفرة في الغلاف الجوي للأرض؟', opts: ['الأكسجين', 'ثاني أكسيد الكربون', 'النيتروجين', 'الهيدروجين'], ans: 2 },
+            { cat: 'تاريخ', q: 'في أي مدينة بُنيت مكتبة الإسكندرية القديمة؟', opts: ['القاهرة', 'الإسكندرية', 'أسوان', 'الأقصر'], ans: 1 },
+            { cat: 'رياضة', q: 'كم عدد لاعبي فريق كرة القدم الأساسيين داخل الملعب؟', opts: ['9 لاعبين', '10 لاعبين', '11 لاعباً', '12 لاعباً'], ans: 2 },
+            { cat: 'أفلام ومسلسلات', q: 'ما اسم الأسد الصغير بطل فيلم الرسوم المتحركة الشهير؟', opts: ['سيمبا', 'موفاسا', 'تيمون', 'بومبا'], ans: 0 },
+            { cat: 'علوم', q: 'كم عدد كواكب المجموعة الشمسية؟', opts: ['7 كواكب', '8 كواكب', '9 كواكب', '10 كواكب'], ans: 1 },
+            { cat: 'ثقافة عامة', q: 'ما هي الدولة التي تُلقب بأرض الشمس المشرقة؟', opts: ['الصين', 'كوريا الجنوبية', 'اليابان', 'تايلاند'], ans: 2 },
+            { cat: 'تاريخ', q: 'من هو العالم العربي الذي يُلقب بأبي البصريات؟', opts: ['ابن سينا', 'الحسن بن الهيثم', 'الخوارزمي', 'جابر بن حيان'], ans: 1 },
+            { cat: 'رياضة', q: 'كل كم سنة تُقام بطولة كأس العالم لكرة القدم؟', opts: ['سنتين', '3 سنوات', '4 سنوات', '5 سنوات'], ans: 2 },
+            { cat: 'ثقافة عامة', q: 'ما هو أطول نهر في العالم؟', opts: ['نهر الأمازون', 'نهر النيل', 'نهر المسيسيبي', 'نهر الدانوب'], ans: 1 },
+            { cat: 'علوم', q: 'ما هو العضو المسؤول عن ضخ الدم في جسم الإنسان؟', opts: ['الرئتان', 'الكبد', 'القلب', 'المعدة'], ans: 2 },
+            { cat: 'أفلام ومسلسلات', q: 'في فيلم البحث عن نيمو، ما نوع السمكة نيمو؟', opts: ['سمكة قرش', 'سمكة المهرج', 'سمكة ذهبية', 'دولفين'], ans: 1 },
+            { cat: 'ثقافة عامة', q: 'ما هي عملة المملكة العربية السعودية؟', opts: ['الدرهم', 'الدينار', 'الريال', 'الجنيه'], ans: 2 },
+            { cat: 'علوم', q: 'ما هو أسرع حيوان بري في العالم؟', opts: ['الأسد', 'الفهد (الشيتا)', 'الغزال', 'النمر'], ans: 1 },
+            { cat: 'تاريخ', q: 'ما اسم السفينة الشهيرة التي غرقت في أول رحلة لها عام 1912؟', opts: ['تيتانيك', 'أولمبيك', 'بريتانيك', 'كوين ماري'], ans: 0 }
+          ],
+          impostorWords: [
+            { category: 'أكلات', word: 'كشري' },
+            { category: 'أماكن', word: 'المتحف المصري' },
+            { category: 'حيوانات', word: 'البطريق' },
+            { category: 'رياضة', word: 'كرة السلة' },
+            { category: 'فواكه', word: 'المانجو' },
+            { category: 'مهن', word: 'رائد فضاء' },
+            { category: 'مواصلات', word: 'مترو الأنفاق' },
+            { category: 'أشياء في البيت', word: 'الثلاجة' }
+          ],
+          drawWords: ['نخلة', 'صاروخ فضاء', 'قطة', 'دراجة هوائية', 'شمسية مطر', 'تاج ملكي', 'ساعة حائط', 'آيس كريم', 'هرم', 'سفينة شراعية', 'نظارة شمسية', 'رجل ثلج'],
+          whoAmI: [
+            { cat: 'حيوانات', name: 'الزرافة' },
+            { cat: 'حيوانات', name: 'الأخطبوط' },
+            { cat: 'حيوانات', name: 'الكنغر' },
+            { cat: 'شخصيات', name: 'عباس بن فرناس' },
+            { cat: 'شخصيات', name: 'سندباد' },
+            { cat: 'شخصيات', name: 'شرلوك هولمز' },
+            { cat: 'أشياء', name: 'البوصلة' },
+            { cat: 'أشياء', name: 'المظلة' },
+            { cat: 'أشياء', name: 'الكاميرا' }
+          ],
+          cases: [
+            {
+              id: 'case_1',
+              title: 'قضية اختفاء الماسة الملكية',
+              summary: 'اختفت ماسة نادرة من خزنة قصر التراث أثناء حفل العشاء الخيري الساعة 9:30 مساءً.',
+              clues: [
+                'كاميرات الممر الشرقي تعطلت بين 9:15 و 9:40 مساءً.',
+                'وُجد أثر حبر أزرق نادر على مقبض الخزنة.',
+                'النافذة كانت مغلقة من الداخل مما يؤكد أن الفاعل من المدعوين.'
+              ],
+              suspects: [
+                { name: 'الأستاذ سامي (أمين المكتبة)', statement: 'كنت أكتب قائمة الكتب النادرة بقلمي الحبر الأزرق طوال المساء.' },
+                { name: 'الآنسة سلمى (منظمة الحفل)', statement: 'كنت في القاعة الرئيسية أرحب بالضيوف أمام الجميع.' },
+                { name: 'المهندس طارق (فني الصيانة)', statement: 'أصلحت الإضاءة في الحديقة الخلفية الساعة 8 وغادرت باكراً.' }
+              ],
+              guiltyIndex: 0,
+              explanation: 'أثر الحبر الأزرق على مقبض الخزنة يطابق القلم الذي كان يستخدمه الأستاذ سامي!'
+            },
+            {
+              id: 'case_2',
+              title: 'لغز وصفة الشيف السرية',
+              summary: 'اختفى دفتر الوصفات السرية لمطعم النيل الذهبي قبل المسابقة الكبرى بساعة.',
+              clues: [
+                'توجد آثار دقيق أبيض تقود من المطبخ إلى المخزن الخلفي.',
+                'باب المخزن لا يُفتح إلا بمفتاح مع مدير المطعم ومساعد الشيف.',
+                'ساعة المطبخ توقفت عند 4:10 عصراً بسبب سقوطها.'
+              ],
+              suspects: [
+                { name: 'كريم (مساعد الشيف)', statement: 'كنت أعجن الفطائر بالدقيق حتى الساعة 4:15 عصراً.' },
+                { name: 'نادر (محاسب المطعم)', statement: 'لم أدخل المطبخ اليوم وكنت أراجع الفواتير في مكتبي.' },
+                { name: 'ليلى (مقدمة الطعام)', statement: 'كنت أرتب الطاولات في الصالة الخارجية.' }
+              ],
+              guiltyIndex: 0,
+              explanation: 'كريم هو الوحيد الذي يملك مفتاح المخزن وكانت يداه ملوثتين بالدقيق وقت الحادثة!'
+            }
+          ],
+          proverbs: [
+            { start: 'اللي بيته من إزاز...', opts: ['ما يحدفش الناس بالطوب', 'يلمع بسرعة', 'يفتح الشبابيك'], ans: 0 },
+            { start: 'عصفور في اليد...', opts: ['يطير في السماء', 'خير من عشرة على الشجرة', 'يغرد صباحاً'], ans: 1 },
+            { start: 'الصديق وقت...', opts: ['السفر', 'الضحك', 'الضيق'], ans: 2 },
+            { start: 'من جد وجد ومن زرع...', opts: ['سقى', 'حصد', 'تعب'], ans: 1 },
+            { start: 'القرد في عين أمه...', opts: ['غزال', 'أسد', 'طاووس'], ans: 0 }
+          ],
+          riddles: [
+            { q: 'ما هو الشيء الذي يكتب ولا يقرأ؟', opts: ['الكتاب', 'القلم', 'السبورة'], ans: 1 },
+            { q: 'ما هو الشيء الذي كلما أخذت منه كبر؟', opts: ['الحفرة', 'الصندوق', 'العمر'], ans: 0 },
+            { q: 'له أسنان ولا يعض، فما هو؟', opts: ['المنشار', 'المشط', 'المفتاح'], ans: 1 },
+            { q: 'يمشي بلا أرجل ويبكي بلا عيون، فما هو؟', opts: ['السحاب', 'النهر', 'الريح'], ans: 0 },
+            { q: 'ما هو البيت الذي ليس فيه أبواب ولا نوافذ؟', opts: ['بيت الشعر', 'بيت العنكبوت', 'بيت النمل'], ans: 0 }
+          ],
+          trueFalse: [
+            { s: 'يستطيع الأخطبوط تغيير لون جلده للتمويه.', ans: true },
+            { s: 'الشمس تدور حول الأرض مرة كل 24 ساعة.', ans: false },
+            { s: 'العسل الطبيعي لا يفسد بمرور الزمن إذا حُفظ جيداً.', ans: true },
+            { s: 'البطريق يعيش في القطب الشمالي مع الدببة القطبية.', ans: false },
+            { s: 'الزرافة تمتلك نفس عدد فقرات الرقبة الموجودة عند الإنسان (7 فقرات).', ans: true }
+          ],
+          estimates: [
+            { q: 'كم يبلغ ارتفاع الهرم الأكبر (خوفو) تقريباً بالمتر؟', target: 138, unit: 'متر' },
+            { q: 'كم عدد عظام جسم الإنسان البالغ؟', target: 206, unit: 'عظمة' },
+            { q: 'كم دقيقة تستغرق أشعة الشمس للوصول إلى الأرض؟', target: 8, unit: 'دقائق' },
+            { q: 'كم عدد أيام السنة الكبيسة؟', target: 366, unit: 'يوم' }
+          ],
+          quotes: [
+            { quote: 'العقل السليم في الجسم السليم', opts: ['حكمة عالمية شهيرة', 'شكسبير', 'ابن بطوطة'], ans: 0 },
+            { quote: 'إلى اللانهائية وما بعدها!', opts: ['وودي', 'باز يطير (حكاية لعبة)', 'نيمو'], ans: 1 },
+            { quote: 'هاكونا ماتاتا.. حكمة نغمها لذيذ', opts: ['علاء الدين', 'تيمون وبومبا', 'طرزان'], ans: 1 }
+          ],
+          confessions: [
+            'ما هو أكثر موقف محرج ومضحك حصل لك في المدرسة؟',
+            'لو ربحت تذكرة سفر مجانية الآن، من ستأخذ معك من الجالسين؟',
+            'ما هي الأكلة التي لا تمل منها أبداً؟',
+            'ما هو أغرب حلم تتذكره؟',
+            'لو أصبحت مديراً للمنزل ليوم واحد، ما أول قرار ستتخذه؟'
+          ],
+          links: [
+            { words: ['تاج', 'نحلة', 'ملكة'], ans: 'خلية النحل' },
+            { words: ['عقارب', 'أرقام', 'حائط'], ans: 'الساعة' },
+            { words: ['مفتاح', 'أوتار', 'نوتة'], ans: 'البيانو / الموسيقى' },
+            { words: ['رمال', 'أهرامات', 'جمل'], ans: 'الصحراء' }
+          ],
+          oddOneOut: [
+            { items: ['تفاح', 'موز', 'بطاطس', 'برتقال'], ans: 2 },
+            { items: ['القاهرة', 'الرياض', 'دبي', 'نهر النيل'], ans: 3 },
+            { items: ['أسد', 'نمر', 'فهد', 'حمامة'], ans: 3 },
+            { items: ['كرة قدم', 'سباحة', 'شطرنج', 'تنس'], ans: 2 }
+          ]
+        };
+      },
+
+      load() {
+        try {
+          const raw = localStorage.getItem(this.KEY);
+          if (!raw) {
+            const def = this.getDefaultState();
+            this.save(def);
+            return def;
+          }
+          const parsed = JSON.parse(raw);
+          const def = this.getDefaultState();
+          return {
+            ...def,
+            ...parsed,
+            siteSettings: { ...def.siteSettings, ...(parsed.siteSettings || {}) },
+            paymentSettings: { ...def.paymentSettings, ...(parsed.paymentSettings || {}) },
+            contentBank: { ...def.contentBank, ...(parsed.contentBank || {}) },
+            games: (parsed.games && parsed.games.length >= 30) ? parsed.games : def.games
+          };
+        } catch (_) {
+          const def = this.getDefaultState();
+          this.save(def);
+          return def;
+        }
+      },
+
+      save(state) {
+        try {
+          localStorage.setItem(this.KEY, JSON.stringify(state));
+        } catch (_) {
+          // تجاهل أخطاء مساحة التخزين المؤقتة
+        }
+      }
+    };
+
+    /* =====================================================================
+       2. إدارة حالة التطبيق والصلاحيات والاشتراكات
+       ===================================================================== */
+    const App = {
+      state: null,
+      route: 'home',
+      selectedCategory: 'الكل',
+      searchQuery: '',
+      offlineSim: false,
+      deferredPrompt: null,
+      adminTab: 'stats',
+      activeTimer: null,
+
+      async init() {
+        await DB.initIDB();
+        this.state = DB.load();
+        this.checkSubscriptionExpirations();
+        this.setupPWA();
+        this.updateNetworkUI();
+        window.addEventListener('online', () => this.updateNetworkUI());
+        window.addEventListener('offline', () => this.updateNetworkUI());
+        this.render();
+      },
+
+      saveState() {
+        DB.save(this.state);
+      },
+
+      getCurrentUser() {
+        if (!this.state.currentUserId) return null;
+        return this.state.users.find(u => u.id === this.state.currentUserId) || null;
+      },
+
+      // التحقق التلقائي من انتهاء صلاحية الاشتراكات
+      checkSubscriptionExpirations() {
+        const today = new Date().toISOString().split('T')[0];
+        let changed = false;
+        this.state.users.forEach(u => {
+          if (u.role !== 'admin' && u.subscription && u.subscription.status === 'active') {
+            if (u.subscription.endDate && u.subscription.endDate < today) {
+              u.subscription.status = 'expired';
+              u.role = 'expired';
+              changed = true;
+            }
+          }
+        });
+        if (changed) this.saveState();
+      },
+
+      // التحقق من وجود اشتراك نشط وغير محظور
+      hasActiveAccess() {
+        const user = this.getCurrentUser();
+        if (!user || user.banned) return false;
+        if (user.role === 'admin') return true;
+        this.checkSubscriptionExpirations();
+        return user.subscription && user.subscription.status === 'active';
+      },
+
+      isOnline() {
+        return !this.offlineSim && navigator.onLine;
+      },
+
+      toggleOfflineSim() {
+        this.offlineSim = !this.offlineSim;
+        this.updateNetworkUI();
+        this.toast(
+          this.offlineSim
+            ? '✈️ تم تفعيل وضع Offline: الألعاب تعمل محلياً على الجهاز!'
+            : '🌐 عاد الاتصال بالإنترنت',
+          this.offlineSim ? 'amber' : 'teal'
+        );
+        this.render();
+      },
+
+      updateNetworkUI() {
+        const dot = document.getElementById('netDot');
+        const label = document.getElementById('netLabel');
+        const btn = document.getElementById('offlineSimBtn');
+        if (!dot || !label) return;
+        if (this.isOnline()) {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block';
+          label.textContent = 'متصل بالإنترنت • الألعاب محفوظة للعمل Offline';
+          if (btn) btn.textContent = 'محاكاة وضع Offline';
+        } else {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 inline-block animate-pulse';
+          label.textContent = 'وضع بدون إنترنت (Offline) • العب على جهاز واحد';
+          if (btn) btn.textContent = 'إلغاء محاكاة Offline';
+        }
+      },
+
+      setupPWA() {
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          this.deferredPrompt = e;
+        });
+      },
+
+      async triggerPWAInstall() {
+        if (this.deferredPrompt) {
+          this.deferredPrompt.prompt();
+          await this.deferredPrompt.userChoice;
+          this.deferredPrompt = null;
+        } else {
+          this.openModal(`
+            <div class="text-center space-y-4">
+              <div class="text-5xl">📲</div>
+              <h3 class="text-2xl font-black text-purple-900">تثبيت لمّة بلاي كتطبيق (PWA)</h3>
+              <p class="text-slate-600 text-sm font-bold leading-relaxed">
+                يمكنك إضافة المنصة إلى الشاشة الرئيسية لتجربة شاشة كاملة واللعب دون إنترنت بعد التحميل:
+              </p>
+              <div class="bg-purple-50 border-2 border-purple-200 rounded-2xl p-4 text-right text-sm font-bold space-y-2">
+                <div><strong>📱 أندرويد (Chrome):</strong> افتح القائمة (⋮) ثم اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».</div>
+                <div><strong>🍏 آيفون (Safari):</strong> اضغط على زر المشاركة ثم اختر «إضافة إلى الصفحة الرئيسية».</div>
+                <div><strong>💻 الكمبيوتر:</strong> اضغط على أيقونة التثبيت في شريط العنوان.</div>
+              </div>
+              <button onclick="App.closeModal()" class="btn-3d btn-purple w-full py-3 rounded-2xl font-black">حسناً</button>
+            </div>
+          `);
+        }
+      },
+
+      toast(msg, tone = 'purple') {
+        const box = document.getElementById('toastBox');
+        const colors = {
+          purple: 'bg-purple-900 border-purple-400 text-white',
+          teal: 'bg-teal-900 border-teal-400 text-white',
+          amber: 'bg-amber-500 border-amber-800 text-slate-950',
+          rose: 'bg-rose-700 border-rose-300 text-white'
+        };
+        const el = document.createElement('div');
+        el.className = `pointer-events-auto px-4 py-3 rounded-2xl border-2 shadow-xl font-extrabold text-sm text-center fade-in ${colors[tone] || colors.purple}`;
+        el.textContent = msg;
+        box.appendChild(el);
+        setTimeout(() => { el.remove(); }, 3400);
+      },
+
+      openModal(html) {
+        const container = document.getElementById('modalContainer');
+        const box = document.getElementById('modalBox');
+        box.innerHTML = `<button onclick="App.closeModal()" aria-label="إغلاق" class="absolute top-4 left-4 w-9 h-9 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-600 font-black flex items-center justify-center">✕</button>` + html;
+        container.classList.remove('hidden');
+      },
+
+      closeModal() {
+        if (this.activeTimer) {
+          clearInterval(this.activeTimer);
+          this.activeTimer = null;
+        }
+        document.getElementById('modalContainer').classList.add('hidden');
+      },
+
+      navigate(route) {
+        if (this.activeTimer) {
+          clearInterval(this.activeTimer);
+          this.activeTimer = null;
+        }
+        this.route = route;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        this.render();
+      },
+
+      /* =====================================================================
+         3. نظام الحسابات والتسجيل والدخول وتعديل البيانات
+         ===================================================================== */
+      quickLogin(email) {
+        const user = this.state.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+        if (!user) return this.toast('الحساب غير موجود', 'rose');
+        if (user.banned) return this.toast('هذا الحساب محظور من الإدارة', 'rose');
+        this.state.currentUserId = user.id;
+        this.saveState();
+        this.closeModal();
+        this.toast(`مرحباً بك يا ${user.name}!`, 'teal');
+        this.render();
+      },
+
+      openAuthModal(mode = 'login') {
+        if (!this.isOnline()) {
+          return this.toast('⚠️ تسجيل الدخول أو إنشاء حساب يتطلب اتصالاً بالإنترنت', 'amber');
+        }
+        if (mode === 'register') {
+          this.openModal(`
+            <div class="space-y-4">
+              <div class="text-center">
+                <div class="text-4xl mb-1">🎉</div>
+                <h3 class="text-2xl font-black text-purple-900">إنشاء حساب جديد</h3>
+                <p class="text-xs text-slate-500 font-bold">سجّل حسابك واختر باقتك لفتح جميع الألعاب</p>
+              </div>
+              <form onsubmit="App.handleRegister(event)" class="space-y-3">
+                <div>
+                  <label class="block text-xs font-extrabold text-slate-700 mb-1">الاسم المستعار</label>
+                  <input id="regName" required type="text" placeholder="مثال: عائلة محمود" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-purple-600 outline-none font-bold" />
+                </div>
+                <div>
+                  <label class="block text-xs font-extrabold text-slate-700 mb-1">البريد الإلكتروني</label>
+                  <input id="regEmail" required type="email" placeholder="name@example.com" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-purple-600 outline-none font-bold" dir="ltr" />
+                </div>
+                <div>
+                  <label class="block text-xs font-extrabold text-slate-700 mb-1">كلمة المرور (6 أحرف على الأقل)</label>
+                  <input id="regPass" required minlength="6" type="password" placeholder="••••••" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-purple-600 outline-none font-bold" dir="ltr" />
+                </div>
+                <button type="submit" class="btn-3d btn-purple w-full py-3.5 rounded-2xl font-black text-base">إنشاء الحساب</button>
+              </form>
+              <div class="text-center text-sm font-bold text-slate-600">
+                لديك حساب بالفعل؟ <button onclick="App.openAuthModal('login')" class="text-purple-700 underline">تسجيل الدخول</button>
+              </div>
+            </div>
+          `);
+        } else if (mode === 'reset') {
+          this.openModal(`
+            <div class="space-y-4">
+              <h3 class="text-xl font-black text-purple-900 text-center">🔑 استعادة كلمة المرور</h3>
+              <form onsubmit="App.handleResetPass(event)" class="space-y-3">
+                <input id="resetEmail" required type="email" placeholder="البريد الإلكتروني المسجل" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 font-bold" dir="ltr" />
+                <input id="resetNewPass" required minlength="6" type="password" placeholder="كلمة المرور الجديدة" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 font-bold" dir="ltr" />
+                <button type="submit" class="btn-3d btn-teal w-full py-3 rounded-2xl font-black">تحديث كلمة المرور</button>
+              </form>
+            </div>
+          `);
+        } else {
+          this.openModal(`
+            <div class="space-y-4">
+              <div class="text-center">
+                <div class="text-4xl mb-1">🎲</div>
+                <h3 class="text-2xl font-black text-purple-900">تسجيل الدخول</h3>
+                <p class="text-xs text-slate-500 font-bold">أدخل بياناتك للوصول إلى حسابك واشتراكك</p>
+              </div>
+              <form onsubmit="App.handleLogin(event)" class="space-y-3">
+                <div>
+                  <label class="block text-xs font-extrabold text-slate-700 mb-1">البريد الإلكتروني</label>
+                  <input id="loginEmail" required type="email" placeholder="user@lamma.play" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-purple-600 outline-none font-bold" dir="ltr" />
+                </div>
+                <div>
+                  <label class="block text-xs font-extrabold text-slate-700 mb-1">كلمة المرور</label>
+                  <input id="loginPass" required type="password" placeholder="••••••" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-purple-600 outline-none font-bold" dir="ltr" />
+                </div>
+                <button type="submit" class="btn-3d btn-purple w-full py-3.5 rounded-2xl font-black text-base">دخول</button>
+              </form>
+              <div class="flex justify-between text-xs font-bold text-slate-600">
+                <button onclick="App.openAuthModal('register')" class="text-purple-700 underline">إنشاء حساب جديد</button>
+                <button onclick="App.openAuthModal('reset')" class="text-slate-500 underline">نسيت كلمة المرور؟</button>
+              </div>
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-2">
+                <div class="text-xs font-black text-slate-700">حسابات جاهزة للتجربة والمراجعة:</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button type="button" onclick="App.quickLogin('user@lamma.play')" class="btn-3d btn-teal py-2 px-3 rounded-xl text-xs font-black">👤 حساب مشترك نشط</button>
+                  <button type="button" onclick="App.quickLogin('admin@lamma.play')" class="btn-3d btn-amber py-2 px-3 rounded-xl text-xs font-black">🛡️ حساب مدير المنصة</button>
+                </div>
+              </div>
+            </div>
+          `);
+        }
+      },
+
+      handleLogin(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        const pass = document.getElementById('loginPass').value;
+        const user = this.state.users.find(u => u.email.toLowerCase() === email && u.passwordHash === pass);
+        if (!user) return this.toast('البريد الإلكتروني أو كلمة المرور غير صحيحة', 'rose');
+        if (user.banned) return this.toast('هذا الحساب محظور من الإدارة', 'rose');
+        this.state.currentUserId = user.id;
+        this.saveState();
+        this.closeModal();
+        this.toast(`مرحباً بك يا ${user.name}!`, 'teal');
+        this.render();
+      },
+
+      handleRegister(e) {
+        e.preventDefault();
+        const name = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim().toLowerCase();
+        const pass = document.getElementById('regPass').value;
+        if (this.state.users.some(u => u.email.toLowerCase() === email)) {
+          return this.toast('هذا البريد الإلكتروني مسجل بالفعل', 'rose');
+        }
+        const newUser = {
+          id: 'u_' + Date.now(),
+          name,
+          email,
+          passwordHash: pass,
+          role: 'unsubscribed',
+          avatar: '🎮',
+          city: 'مصر',
+          createdAt: new Date().toISOString().split('T')[0],
+          banned: false,
+          subscription: { status: 'none', planName: 'بدون اشتراك', startDate: '-', endDate: '-' },
+          stats: { points: 0, wins: 0, playedGames: [], achievements: ['عضو جديد'] }
+        };
+        this.state.users.push(newUser);
+        this.state.currentUserId = newUser.id;
+        this.saveState();
+        this.closeModal();
+        this.toast('تم إنشاء حسابك! اختر الباقة للاشتراك عبر فودافون كاش', 'teal');
+        this.navigate('plans');
+      },
+
+      handleResetPass(e) {
+        e.preventDefault();
+        const email = document.getElementById('resetEmail').value.trim().toLowerCase();
+        const newPass = document.getElementById('resetNewPass').value;
+        const user = this.state.users.find(u => u.email.toLowerCase() === email);
+        if (!user) return this.toast('البريد الإلكتروني غير موجود', 'rose');
+        user.passwordHash = newPass;
+        this.saveState();
+        this.toast('تم تحديث كلمة المرور بنجاح', 'teal');
+        this.openAuthModal('login');
+      },
+
+      logout() {
+        this.state.currentUserId = null;
+        this.saveState();
+        this.toast('تم تسجيل الخروج', 'purple');
+        this.navigate('home');
+      },
+
+      openEditProfileModal() {
+        const user = this.getCurrentUser();
+        if (!user) return;
+        const avatars = ['🦁', '🎮', '👑', '🦊', '🚀', '🎯', '🐼', '🌟'];
+        this.openModal(`
+          <div class="space-y-4">
+            <h3 class="text-xl font-black text-purple-900">✏️ تعديل بيانات الحساب</h3>
+            <form onsubmit="App.saveProfileChanges(event)" class="space-y-3">
+              <div>
+                <label class="block text-xs font-extrabold text-slate-700 mb-1">الاسم المستعار</label>
+                <input id="editName" required value="${user.name}" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 font-bold" />
+              </div>
+              <div>
+                <label class="block text-xs font-extrabold text-slate-700 mb-1">المدينة / المحافظة</label>
+                <input id="editCity" value="${user.city || ''}" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 font-bold" />
+              </div>
+              <div>
+                <label class="block text-xs font-extrabold text-slate-700 mb-1">الصورة الشخصية</label>
+                <div class="flex flex-wrap gap-2">
+                  ${avatars.map(av => `
+                    <label class="cursor-pointer">
+                      <input type="radio" name="editAvatar" value="${av}" ${user.avatar === av ? 'checked' : ''} class="hidden peer" />
+                      <span class="w-11 h-11 rounded-xl border-2 border-slate-200 peer-checked:border-purple-600 peer-checked:bg-purple-50 flex items-center justify-center text-2xl">${av}</span>
+                    </label>
+                  `).join('')}
+                </div>
+              </div>
+              <button type="submit" class="btn-3d btn-purple w-full py-3 rounded-2xl font-black">حفظ التعديلات</button>
+            </form>
+          </div>
+        `);
+      },
+
+      saveProfileChanges(e) {
+        e.preventDefault();
+        const user = this.getCurrentUser();
+        if (!user) return;
+        user.name = document.getElementById('editName').value.trim() || user.name;
+        user.city = document.getElementById('editCity').value.trim() || user.city;
+        const chosen = document.querySelector('input[name="editAvatar"]:checked');
+        if (chosen) user.avatar = chosen.value;
+        this.saveState();
+        this.closeModal();
+        this.toast('تم حفظ التعديلات بنجاح', 'teal');
+        this.render();
+      },
+
+      /* =====================================================================
+         4. رحلة الدفع الحصرية عبر فودافون كاش (Vodafone Cash)
+         ===================================================================== */
+      openVodafoneCheckout(planId) {
+        const user = this.getCurrentUser();
+        if (!user) {
+          this.toast('يرجى تسجيل الدخول أو إنشاء حساب أولاً', 'amber');
+          return this.openAuthModal('login');
+        }
+        if (!this.isOnline()) {
+          return this.toast('⚠️ إرسال طلب الاشتراك يتطلب اتصالاً بالإنترنت', 'amber');
+        }
+        const plan = this.state.plans.find(p => p.id === planId);
+        if (!plan) return;
+
+        const vfNum = (this.state.paymentSettings.vodafoneCashNumber || '').trim();
+        const orderId = 'VF-' + Math.floor(100000 + Math.random() * 900000);
+
+        this.openModal(`
+          <div class="space-y-4">
+            <div class="flex items-center gap-3 border-b pb-3">
+              <div class="w-12 h-12 rounded-2xl bg-red-600 text-white font-black flex items-center justify-center text-xl">VF</div>
+              <div>
+                <h3 class="text-xl font-black text-slate-900">الدفع عبر فودافون كاش</h3>
+                <p class="text-xs text-slate-500 font-bold">رقم الطلب الفريد: <strong class="text-purple-700" dir="ltr">${orderId}</strong></p>
+              </div>
+            </div>
+
+            <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-4 space-y-2">
+              <div class="flex justify-between text-sm font-extrabold">
+                <span>الباقة المختارة:</span>
+                <span class="text-purple-900">${plan.name} (${plan.durationDays} يوم)</span>
+              </div>
+              <div class="flex justify-between text-base font-black">
+                <span>قيمة الاشتراك:</span>
+                <span class="text-red-700 text-xl">${plan.price} ج.م</span>
+              </div>
+              <div class="pt-2 border-t border-red-200">
+                <div class="text-xs font-bold text-slate-600 mb-1">رقم فودافون كاش الخاص بالمنصة:</div>
+                ${vfNum
+                  ? `<div class="bg-white border-2 border-red-400 rounded-xl px-4 py-2.5 flex items-center justify-between">
+                       <span class="font-black text-xl tracking-wider text-red-700" dir="ltr">${vfNum}</span>
+                       <button type="button" onclick="App.copyText('${vfNum}')" class="bg-red-600 text-white text-xs font-black px-3 py-1.5 rounded-lg">نسخ الرقم</button>
+                     </div>`
+                  : `<div class="bg-amber-100 border border-amber-400 text-amber-900 p-3 rounded-xl text-xs font-extrabold">
+                       ⚠️ لم يتم تعيين رقم فودافون كاش بعد. يمكن للمدير تعيينه من «لوحة الإدارة &gt; إعدادات فودافون كاش».
+                     </div>`
+                }
+              </div>
+              <p class="text-xs text-slate-600 font-bold leading-relaxed pt-1">${this.state.paymentSettings.instructions}</p>
+            </div>
+
+            <form onsubmit="App.submitPaymentRequest(event, '${orderId}', '${plan.id}')" class="space-y-3">
+              <div>
+                <label class="block text-xs font-extrabold text-slate-700 mb-1">رقم الهاتف الذي حوّلت منه *</label>
+                <input id="vfSenderPhone" required pattern="^01[0125][0-9]{8}$" placeholder="010xxxxxxxx" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 font-bold" dir="ltr" />
+              </div>
+              <div>
+                <label class="block text-xs font-extrabold text-slate-700 mb-1">رقم مرجع العملية (اختياري)</label>
+                <input id="vfRefCode" placeholder="مثال: 77412098" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 font-bold" dir="ltr" />
+              </div>
+              <div>
+                <label class="block text-xs font-extrabold text-slate-700 mb-1">رفع صورة إثبات التحويل *</label>
+                <input id="vfReceiptFile" required type="file" accept="image/png,image/jpeg,image/webp" onchange="App.previewReceiptFile(this)" class="w-full text-xs font-bold bg-slate-50 p-2.5 rounded-xl border-2 border-dashed border-slate-300" />
+                <img id="vfReceiptPreviewImg" class="hidden max-h-40 mt-2 mx-auto rounded-xl border object-contain" alt="معاينة الإيصال" />
+              </div>
+              <button type="submit" class="btn-3d btn-rose w-full py-3.5 rounded-2xl font-black text-base">إرسال طلب الاشتراك</button>
+            </form>
+          </div>
+        `);
+      },
+
+      previewReceiptFile(input) {
+        const img = document.getElementById('vfReceiptPreviewImg');
+        if (!img || !input.files || !input.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          img.src = reader.result;
+          img.classList.remove('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+      },
+
+      copyText(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        this.toast('تم نسخ الرقم بنجاح', 'teal');
+      },
+
+      submitPaymentRequest(e, orderId, planId) {
+        e.preventDefault();
+        const user = this.getCurrentUser();
+        const plan = this.state.plans.find(p => p.id === planId);
+        if (!user || !plan) return;
+
+        const senderPhone = document.getElementById('vfSenderPhone').value.trim();
+        const refCode = document.getElementById('vfRefCode').value.trim();
+        const file = document.getElementById('vfReceiptFile').files[0];
+
+        if (!file) return this.toast('يرجى رفع صورة إثبات التحويل', 'rose');
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+          return this.toast('الصيغة المسموحة للصورة هي JPG أو PNG أو WEBP', 'rose');
+        }
+        const maxBytes = (this.state.paymentSettings.maxImageSizeMB || 5) * 1024 * 1024;
+        if (file.size > maxBytes) {
+          return this.toast(`حجم الصورة أكبر من ${this.state.paymentSettings.maxImageSizeMB} ميجابايت`, 'rose');
+        }
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const dataUrl = reader.result;
+          await DB.saveReceiptBlob(orderId, dataUrl);
+          const reqObj = {
+            orderId,
+            userId: user.id,
+            userName: user.name,
+            userEmail: user.email,
+            planId: plan.id,
+            planName: plan.name,
+            durationDays: plan.durationDays,
+            amount: plan.price,
+            senderPhone,
+            refCode: refCode || 'غير متوفر',
+            receiptPreview: dataUrl,
+            createdAt: new Date().toLocaleString('ar-EG'),
+            // يبدأ الطلب دائماً بحالة قيد المراجعة ولا يُفعّل تلقائياً
+            status: 'pending',
+            rejectionReason: '',
+            adminNote: '',
+            reviewedBy: '',
+            reviewedAt: ''
+          };
+          this.state.paymentRequests.unshift(reqObj);
+          this.saveState();
+          this.showOrderConfirmation(reqObj);
+        };
+        reader.readAsDataURL(file);
+      },
+
+      showOrderConfirmation(req) {
+        this.openModal(`
+          <div class="space-y-4 text-center">
+            <div class="w-16 h-16 rounded-full bg-amber-100 text-amber-600 text-3xl flex items-center justify-center mx-auto border-2 border-amber-300">⏳</div>
+            <h3 class="text-xl font-black text-slate-900">تأكيد استلام طلب الاشتراك</h3>
+            <p class="bg-amber-50 border-2 border-amber-200 text-amber-900 p-3.5 rounded-2xl text-sm font-extrabold leading-relaxed">
+              تم استلام طلب الاشتراك بنجاح. طلبك الآن قيد المراجعة من الإدارة. لن يتم تفعيل اشتراكك إلا بعد التأكد من وصول المبلغ والموافقة على عملية الدفع.
+            </p>
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-right text-sm font-bold space-y-2">
+              <div class="flex justify-between"><span>رقم الطلب:</span><strong dir="ltr">${req.orderId}</strong></div>
+              <div class="flex justify-between"><span>الباقة المختارة:</span><strong>${req.planName}</strong></div>
+              <div class="flex justify-between"><span>المبلغ:</span><strong>${req.amount} ج.م</strong></div>
+              <div class="flex justify-between"><span>تاريخ إرسال الطلب:</span><strong>${req.createdAt}</strong></div>
+              <div class="flex justify-between"><span>حالة الطلب:</span><span class="px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900 font-black text-xs">قيد المراجعة</span></div>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-500 mb-1">صورة إثبات التحويل المرفوعة:</div>
+              <img src="${req.receiptPreview}" alt="صورة إثبات التحويل" class="max-h-48 mx-auto rounded-xl border-2 border-slate-200 object-contain" />
+            </div>
+            <button onclick="App.closeModal(); App.navigate('account');" class="btn-3d btn-purple w-full py-3 rounded-2xl font-black">الانتقال إلى حسابي</button>
+          </div>
+        `);
+      },
+
+      /* =====================================================================
+         5. نظام مراجعة الدفع ولوحة الإدارة المحمية
+         ===================================================================== */
+      adminReviewPayment(orderId, decision) {
+        const admin = this.getCurrentUser();
+        if (!admin || admin.role !== 'admin') return this.toast('غير مصرح لك بتنفيذ هذا الإجراء', 'rose');
+
+        const req = this.state.paymentRequests.find(r => r.orderId === orderId);
+        if (!req) return;
+        // منع تكرار تفعيل نفس الطلب أو تعديل طلب تم البت فيه
+        if (req.status !== 'pending') {
+          return this.toast('تمت مراجعة هذا الطلب مسبقاً ولا يمكن تكرار التفعيل', 'rose');
+        }
+
+        const noteEl = document.getElementById('adminNoteInput');
+        const reasonEl = document.getElementById('adminRejectReasonInput');
+        const adminNote = noteEl ? noteEl.value.trim() : '';
+        const rejectionReason = reasonEl ? reasonEl.value.trim() : '';
+
+        if (decision === 'rejected' && !rejectionReason) {
+          return this.toast('يرجى كتابة سبب الرفض', 'amber');
+        }
+
+        req.status = decision;
+        req.adminNote = adminNote;
+        req.rejectionReason = decision === 'rejected' ? rejectionReason : '';
+        req.reviewedBy = admin.name;
+        req.reviewedAt = new Date().toLocaleString('ar-EG');
+
+        if (decision === 'approved') {
+          const user = this.state.users.find(u => u.id === req.userId);
+          if (user) {
+            const start = new Date();
+            const end = new Date(start.getTime() + req.durationDays * 24 * 60 * 60 * 1000);
+            user.role = user.role === 'admin' ? 'admin' : 'subscriber';
+            user.subscription = {
+              status: 'active',
+              planName: req.planName,
+              startDate: start.toISOString().split('T')[0],
+              endDate: end.toISOString().split('T')[0]
+            };
+          }
+          this.state.adminLogs.unshift({
+            id: 'log_' + Date.now(),
+            action: `قبول طلب دفع ${req.orderId} وتفعيل اشتراك ${req.userName}`,
+            adminName: admin.name,
+            date: req.reviewedAt
+          });
+          this.toast('✅ تم قبول الطلب وتفعيل الاشتراك بنجاح', 'teal');
+        } else {
+          this.state.adminLogs.unshift({
+            id: 'log_' + Date.now(),
+            action: `رفض طلب دفع ${req.orderId} (${req.userName}) — السبب: ${rejectionReason}`,
+            adminName: admin.name,
+            date: req.reviewedAt
+          });
+          this.toast('❌ تم رفض الطلب وتسجيل السبب', 'rose');
+        }
+
+        this.saveState();
+        this.closeModal();
+        this.render();
+      },
+
+      openPaymentReviewModal(orderId) {
+        const req = this.state.paymentRequests.find(r => r.orderId === orderId);
+        if (!req) return;
+        this.openModal(`
+          <div class="space-y-4">
+            <h3 class="text-xl font-black text-slate-900">مراجعة طلب الدفع <span dir="ltr" class="text-purple-700">${req.orderId}</span></h3>
+            <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-2xl text-xs font-bold border">
+              <div>المستخدم: <strong>${req.userName}</strong></div>
+              <div>البريد: <strong dir="ltr">${req.userEmail}</strong></div>
+              <div>الباقة: <strong>${req.planName}</strong></div>
+              <div>المبلغ: <strong class="text-emerald-700">${req.amount} ج.م</strong></div>
+              <div>رقم المحوّل: <strong dir="ltr">${req.senderPhone}</strong></div>
+              <div>مرجع العملية: <strong dir="ltr">${req.refCode}</strong></div>
+            </div>
+            <div class="bg-slate-900 rounded-2xl p-3 text-center">
+              <div class="text-xs text-slate-300 font-bold mb-1">صورة إثبات الدفع (حجم كبير للمراجعة):</div>
+              <img src="${req.receiptPreview}" alt="إثبات التحويل" class="max-h-80 mx-auto rounded-xl object-contain" />
+            </div>
+            ${req.status === 'pending' ? `
+              <div class="space-y-2">
+                <input id="adminNoteInput" placeholder="ملاحظة إدارية (اختياري)" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 text-xs font-bold" />
+                <input id="adminRejectReasonInput" placeholder="سبب الرفض (مطلوب عند رفض الطلب)" class="w-full px-3 py-2 rounded-xl border-2 border-rose-200 text-xs font-bold" />
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                  <button onclick="App.adminReviewPayment('${req.orderId}', 'approved')" class="btn-3d btn-teal py-3 rounded-2xl font-black text-sm">✅ قبول وتفعيل الاشتراك</button>
+                  <button onclick="App.adminReviewPayment('${req.orderId}', 'rejected')" class="btn-3d btn-rose py-3 rounded-2xl font-black text-sm">❌ رفض الطلب</button>
+                </div>
+              </div>
+            ` : `
+              <div class="p-3 rounded-xl bg-slate-100 text-xs font-extrabold text-slate-700">
+                تمت المراجعة بواسطة: ${req.reviewedBy} بتاريخ ${req.reviewedAt} — الحالة: ${req.status === 'approved' ? 'مقبول' : 'مرفوض (' + req.rejectionReason + ')'}
+              </div>
+            `}
+          </div>
+        `);
+      },
+
+      /* =====================================================================
+         6. تشغيل الألعاب على جهاز واحد (Pass & Play)
+         ===================================================================== */
+      launchGame(gameId) {
+        const game = this.state.games.find(g => g.id === gameId);
+        if (!game || !game.active) return this.toast('هذه اللعبة غير متاحة حالياً', 'rose');
+
+        if (!this.hasActiveAccess()) {
+          this.openModal(`
+            <div class="text-center space-y-4">
+              <div class="text-5xl">🔒</div>
+              <h3 class="text-2xl font-black text-purple-900">الاشتراك مطلوب لبدء اللعب</h3>
+              <p class="text-sm text-slate-600 font-bold leading-relaxed">
+                يمكنك تصفح جميع الألعاب الـ 30 والاطلاع على تفاصيلها، ولبدء اللعب على جهازك وبدون إنترنت يرجى تفعيل اشتراكك عبر فودافون كاش.
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button onclick="App.closeModal(); App.navigate('plans');" class="btn-3d btn-amber py-3 rounded-2xl font-black">💎 باقات الاشتراك</button>
+                <button onclick="App.closeModal(); App.openAuthModal('login');" class="btn-3d btn-purple py-3 rounded-2xl font-black">👤 تسجيل الدخول</button>
+              </div>
+            </div>
+          `);
+          return;
+        }
+
+        game.plays = (game.plays || 0) + 1;
+        const user = this.getCurrentUser();
+        if (user && !user.stats.playedGames.includes(game.id)) {
+          user.stats.playedGames.push(game.id);
+        }
+        this.saveState();
+
+        this.openModal(`
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${game.color} text-white text-3xl flex items-center justify-center shadow">${game.icon}</div>
+              <div>
+                <h3 class="text-2xl font-black text-slate-900">${game.title}</h3>
+                <p class="text-xs font-bold text-slate-500">${game.players} • ${game.duration} • لعب محلي على جهاز واحد</p>
+              </div>
+            </div>
+            <p class="text-sm text-slate-600 font-bold bg-slate-50 p-3 rounded-2xl border">${game.desc}</p>
+            <div>
+              <label class="block text-xs font-extrabold text-slate-700 mb-2">أسماء اللاعبين على الجهاز نفسه (من 2 إلى 8 لاعبين):</label>
+              <div id="playersInputs" class="grid grid-cols-2 gap-2">
+                <input value="لاعب 1" class="player-name-in px-3 py-2 rounded-xl border-2 border-slate-200 font-bold text-sm" />
+                <input value="لاعب 2" class="player-name-in px-3 py-2 rounded-xl border-2 border-slate-200 font-bold text-sm" />
+                <input value="لاعب 3" class="player-name-in px-3 py-2 rounded-xl border-2 border-slate-200 font-bold text-sm" />
+                <input value="" placeholder="لاعب 4 (اختياري)" class="player-name-in px-3 py-2 rounded-xl border-2 border-slate-200 font-bold text-sm" />
+              </div>
+              <button type="button" onclick="Games.addPlayerInput()" class="mt-2 text-xs font-black text-purple-700 underline">+ إضافة لاعب آخر</button>
+            </div>
+            <button onclick="Games.start('${game.id}')" class="btn-3d btn-teal w-full py-3.5 rounded-2xl font-black text-lg">🚀 ابدأ اللعب</button>
+          </div>
+        `);
+      }
+    };
+
+    /* =====================================================================
+       7. محرك الألعاب الثلاثين القابلة للعب فعلياً (Games Engine)
+       ===================================================================== */
+    const Games = {
+      session: null,
+
+      addPlayerInput() {
+        const box = document.getElementById('playersInputs');
+        if (!box || box.children.length >= 8) return App.toast('الحد الأقصى 8 لاعبين', 'amber');
+        const idx = box.children.length + 1;
+        const inp = document.createElement('input');
+        inp.placeholder = `لاعب ${idx} (اختياري)`;
+        inp.className = 'player-name-in px-3 py-2 rounded-xl border-2 border-slate-200 font-bold text-sm';
+        box.appendChild(inp);
+      },
+
+      start(gameId) {
+        const inputs = [...document.querySelectorAll('.player-name-in')];
+        const names = inputs.map(i => i.value.trim()).filter(Boolean);
+        if (names.length < 2) return App.toast('أدخل اسم لاعبين على الأقل', 'amber');
+
+        const game = App.state.games.find(g => g.id === gameId);
+        this.session = {
+          game,
+          players: names.map((name, i) => ({ id: i, name, score: 0 })),
+          round: 0,
+          turn: 0,
+          data: {}
+        };
+        this.routeGame(gameId);
+      },
+
+      renderHeader(subtitle = '') {
+        const s = this.session;
+        return `
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b-2 border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">${s.game.icon}</span>
+              <div>
+                <h4 class="font-black text-base text-slate-900 leading-none">${s.game.title}</h4>
+                <span class="text-[11px] font-bold text-purple-700">${subtitle}</span>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              ${s.players.map(p => `<span class="px-2.5 py-1 rounded-xl bg-purple-50 border border-purple-200 text-xs font-black text-purple-900">${p.name}: ${p.score}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      },
+
+      // شاشة النتائج النهائية وإعلان الفائز وحفظ النقاط والشارات
+      finishGame(badgeName = 'بطل اللمة') {
+        if (App.activeTimer) {
+          clearInterval(App.activeTimer);
+          App.activeTimer = null;
+        }
+        const s = this.session;
+        const sorted = [...s.players].sort((a, b) => b.score - a.score);
+        const winner = sorted[0];
+        const user = App.getCurrentUser();
+        if (user) {
+          user.stats.wins += 1;
+          user.stats.points += Math.max(50, winner.score);
+          if (!user.stats.achievements.includes(badgeName)) {
+            user.stats.achievements.push(badgeName);
+          }
+          App.saveState();
+        }
+        App.openModal(`
+          <div class="text-center space-y-4">
+            <div class="text-6xl">🏆</div>
+            <h3 class="text-2xl font-black text-purple-900">الفائز: ${winner.name}</h3>
+            <div class="inline-block px-4 py-1.5 rounded-full bg-amber-100 border-2 border-amber-300 text-amber-900 font-black text-xs">
+              🏅 شارة مكتسبة: ${badgeName}
+            </div>
+            <div class="space-y-2 max-w-md mx-auto">
+              ${sorted.map((p, idx) => `
+                <div class="flex items-center justify-between px-4 py-3 rounded-2xl border-2 ${idx === 0 ? 'bg-amber-50 border-amber-400 font-black' : 'bg-slate-50 border-slate-200 font-bold'}">
+                  <span>${idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '🎖️'} ${p.name}</span>
+                  <span class="text-purple-800">${p.score} نقطة</span>
+                </div>
+              `).join('')}
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+              <button onclick="Games.start('${s.game.id}')" class="btn-3d btn-teal py-3 rounded-2xl font-black">🔄 لعب مرة أخرى</button>
+              <button onclick="App.closeModal()" class="btn-3d btn-purple py-3 rounded-2xl font-black">🏠 إنهاء والعودة</button>
+            </div>
+          </div>
+        `);
+      },
+
+      routeGame(id) {
+        if (id === 'g1' || id === 'g22' || id === 'g30') return this.playQuiz(id === 'g30' ? 8 : 5);
+        if (id === 'g2') return this.playImpostor();
+        if (id === 'g3') return this.playDrawAndGuess();
+        if (id === 'g4') return this.playWordChallenge();
+        if (id === 'g5' || id === 'g26') return this.playDetective();
+        if (id === 'g6') return this.playMemoryMatch();
+        if (id === 'g7' || id === 'g28') return this.playMindStrategy();
+        if (id === 'g8' || id === 'g27') return this.playWhoAmI(id === 'g27');
+        if (id === 'g9' || id === 'g20' || id === 'g23') return this.playSpeedReflex();
+        if (id === 'g10') return this.playCoopAdventure();
+        if (id === 'g11') return this.playProverbs();
+        if (id === 'g12') return this.playRiddles();
+        if (id === 'g13') return this.playEstimate();
+        if (id === 'g14') return this.playTrueFalse();
+        if (id === 'g15') return this.playWheel();
+        if (id === 'g16') return this.playColorCode();
+        if (id === 'g17') return this.playMentalMath();
+        if (id === 'g18') return this.playWhoSaidIt();
+        if (id === 'g19') return this.playConfessionChair();
+        if (id === 'g21') return this.playMagicLink();
+        if (id === 'g24') return this.playAutobusComplete();
+        if (id === 'g25') return this.playOddOneOut();
+        if (id === 'g29') return this.playNumberSequence();
+      },
+
+      /* --- مملكة الأسئلة / عواصم ومعالم / بطولة اللمة --- */
+      playQuiz(totalRounds = 5) {
+        const bank = App.state.contentBank.quiz;
+        if (!this.session.data.questions) {
+          this.session.data.questions = [...bank].sort(() => Math.random() - 0.5).slice(0, totalRounds);
+          this.session.data.total = totalRounds;
+        }
+        const qIdx = this.session.round;
+        if (qIdx >= this.session.data.questions.length) return this.finishGame('ملك المعلومات');
+
+        const item = this.session.data.questions[qIdx];
+        const activePlayer = this.session.players[qIdx % this.session.players.length];
+        let timeLeft = 15;
+
+        App.openModal(`
+          ${this.renderHeader(`سؤال ${qIdx + 1} من ${this.session.data.questions.length}`)}
+          <div class="space-y-4">
+            <div class="flex items-center justify-between bg-amber-50 border-2 border-amber-200 px-4 py-2.5 rounded-2xl">
+              <span class="font-black text-sm text-amber-900">🎯 دور: ${activePlayer.name}</span>
+              <span id="quizTimer" class="font-black text-base text-rose-600">⏱️ ${timeLeft} ث</span>
+            </div>
+            <div class="bg-purple-50 border-2 border-purple-200 p-4 rounded-2xl">
+              <span class="text-xs font-black text-purple-600">${item.cat}</span>
+              <h3 class="text-lg sm:text-xl font-black text-slate-900 mt-1">${item.q}</h3>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              ${item.opts.map((opt, idx) => `
+                <button onclick="Games.answerQuiz(${idx})" class="btn-3d btn-white p-3.5 rounded-2xl font-extrabold text-right text-sm hover:border-purple-500">
+                  <span class="inline-block w-6 h-6 rounded-lg bg-purple-100 text-purple-800 text-center ml-2">${idx + 1}</span> ${opt}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `);
+
+        this.session.data.qStart = Date.now();
+        if (App.activeTimer) clearInterval(App.activeTimer);
+        App.activeTimer = setInterval(() => {
+          timeLeft--;
+          const el = document.getElementById('quizTimer');
+          if (el) el.textContent = `⏱️ ${timeLeft} ث`;
+          if (timeLeft <= 0) {
+            clearInterval(App.activeTimer);
+            App.toast('انتهى الوقت!', 'amber');
+            this.session.round++;
+            this.playQuiz(totalRounds);
+          }
+        }, 1000);
+      },
+
+      answerQuiz(chosenIdx) {
+        if (App.activeTimer) clearInterval(App.activeTimer);
+        const qIdx = this.session.round;
+        const item = this.session.data.questions[qIdx];
+        const activePlayer = this.session.players[qIdx % this.session.players.length];
+        if (chosenIdx === item.ans) {
+          const speedBonus = Math.max(20, 100 - Math.floor((Date.now() - this.session.data.qStart) / 200));
+          activePlayer.score += 100 + speedBonus;
+          App.toast(`🎉 صحيح! +${100 + speedBonus} نقطة (مع مكافأة السرعة)`, 'teal');
+        } else {
+          App.toast(`❌ خطأ! الإجابة الصحيحة: ${item.opts[item.ans]}`, 'rose');
+        }
+        this.session.round++;
+        setTimeout(() => this.playQuiz(this.session.data.total), 600);
+      },
+
+      /* --- مين الكذاب؟ مع شاشة خصوصية أثناء تمرير الجهاز --- */
+      playImpostor() {
+        const list = App.state.contentBank.impostorWords;
+        if (!this.session.data.secret) {
+          const pick = list[Math.floor(Math.random() * list.length)];
+          this.session.data.secret = pick;
+          this.session.data.impostorIdx = Math.floor(Math.random() * this.session.players.length);
+          this.session.data.revealIdx = 0;
+          this.session.data.wordVisible = false;
+        }
+        const d = this.session.data;
+        if (d.revealIdx < this.session.players.length) {
+          const p = this.session.players[d.revealIdx];
+          const isImpostor = d.revealIdx === d.impostorIdx;
+          App.openModal(`
+            ${this.renderHeader('تمرير الجهاز السري')}
+            <div class="text-center space-y-4 py-4">
+              <div class="text-5xl">🤫</div>
+              <h3 class="text-2xl font-black text-slate-900">مرّر الجهاز إلى: <span class="text-purple-700">${p.name}</span></h3>
+              <p class="text-xs text-slate-500 font-bold">احرص على عدم رؤية الآخرين للشاشة أثناء قراءة كلمتك</p>
+              ${!d.wordVisible ? `
+                <button onclick="Games.session.data.wordVisible = true; Games.playImpostor();" class="btn-3d btn-amber px-8 py-4 rounded-2xl font-black text-lg">👁️ إظهار كلمتي السرية</button>
+              ` : `
+                <div class="p-6 rounded-3xl border-2 ${isImpostor ? 'bg-rose-50 border-rose-400' : 'bg-teal-50 border-teal-400'} space-y-2">
+                  <div class="text-xs font-extrabold text-slate-500">الفئة: ${d.secret.category}</div>
+                  ${isImpostor
+                    ? `<div class="text-2xl font-black text-rose-700">🕵️‍♂️ أنت الكذاب!</div><p class="text-xs font-bold text-slate-700">حاول التمويه والإجابة بذكاء دون أن يكتشفك الباقون.</p>`
+                    : `<div class="text-3xl font-black text-teal-800">${d.secret.word}</div><p class="text-xs font-bold text-slate-600">احفظ الكلمة ثم أخفِ الشاشة وسلم الجهاز.</p>`
+                  }
+                </div>
+                <button onclick="Games.session.data.wordVisible = false; Games.session.data.revealIdx++; Games.playImpostor();" class="btn-3d btn-purple w-full py-3.5 rounded-2xl font-black">🙈 إخفاء وتمرير للتالي</button>
+              `}
+            </div>
+          `);
+        } else {
+          App.openModal(`
+            ${this.renderHeader('الأسئلة والتصويت')}
+            <div class="space-y-4 text-center">
+              <div class="text-4xl">🗳️</div>
+              <h3 class="text-xl font-black text-slate-900">اسألوا بعضكم ثم صوّتوا على الكذاب!</h3>
+              <p class="text-xs text-slate-500 font-bold">الفئة: <strong>${d.secret.category}</strong></p>
+              <div class="grid grid-cols-2 gap-2.5">
+                ${this.session.players.map((p, idx) => `
+                  <button onclick="Games.resolveImpostorVote(${idx})" class="btn-3d btn-white py-3.5 px-4 rounded-2xl font-black text-sm">👉 ${p.name}</button>
+                `).join('')}
+              </div>
+            </div>
+          `);
+        }
+      },
+
+      resolveImpostorVote(votedIdx) {
+        const d = this.session.data;
+        const impostor = this.session.players[d.impostorIdx];
+        if (votedIdx === d.impostorIdx) {
+          this.session.players.forEach((p, idx) => { if (idx !== d.impostorIdx) p.score += 150; });
+          App.toast(`🎉 أحسنتم! الكذاب كان ${impostor.name} والكلمة: ${d.secret.word}`, 'teal');
+        } else {
+          impostor.score += 250;
+          App.toast(`😈 نجح الكذاب (${impostor.name}) في التمويه! الكلمة: ${d.secret.word}`, 'rose');
+        }
+        this.finishGame('كاشف الكذابين');
+      },
+
+      /* --- ارسم وخمّن (HTML5 Canvas باللمس والماوس) --- */
+      playDrawAndGuess() {
+        const words = App.state.contentBank.drawWords;
+        const drawer = this.session.players[this.session.round % this.session.players.length];
+        const word = words[Math.floor(Math.random() * words.length)];
+        this.session.data = { drawer, word, revealed: false, history: [], color: '#0F172A', size: 5 };
+
+        App.openModal(`
+          ${this.renderHeader(`جولة ${this.session.round + 1} من ${this.session.players.length}`)}
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 bg-amber-50 p-3 rounded-2xl border border-amber-200">
+              <span class="font-black text-sm">🎨 الرسام: ${drawer.name}</span>
+              <button id="toggleWordBtn" onclick="Games.toggleDrawWord()" class="bg-amber-400 text-slate-950 px-3 py-1 rounded-xl font-black text-xs">👁️ إظهار الكلمة للرسام</button>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5">
+                ${['#0F172A', '#E11D48', '#2563EB', '#16A34A', '#F59E0B', '#9333EA'].map(c => `
+                  <button onclick="Games.setBrushColor('${c}', 5)" style="background:${c}" class="w-7 h-7 rounded-full border-2 border-white shadow"></button>
+                `).join('')}
+                <button onclick="Games.setBrushColor('#FFFFFF', 18)" class="px-2.5 py-1 rounded-lg bg-slate-200 text-xs font-black">ممحاة</button>
+              </div>
+              <div class="flex gap-1.5">
+                <button onclick="Games.undoCanvas()" class="px-2.5 py-1 rounded-lg bg-slate-100 border text-xs font-black">↩️ تراجع</button>
+                <button onclick="Games.clearCanvas()" class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 text-xs font-black">🗑️ مسح</button>
+              </div>
+            </div>
+            <canvas id="drawCanvas" height="230"></canvas>
+            <div class="text-xs font-extrabold text-slate-600">من خمّن الكلمة بشكل صحيح؟</div>
+            <div class="flex flex-wrap gap-2">
+              ${this.session.players.filter(p => p.id !== drawer.id).map(p => `
+                <button onclick="Games.scoreDrawGuess(${p.id})" class="btn-3d btn-teal px-3.5 py-2 rounded-xl text-xs font-black">✅ ${p.name}</button>
+              `).join('')}
+              <button onclick="Games.nextDrawRound()" class="btn-3d btn-white px-3.5 py-2 rounded-xl text-xs font-black">الجولة التالية</button>
+            </div>
+          </div>
+        `);
+        setTimeout(() => this.initCanvas(), 50);
+      },
+
+      toggleDrawWord() {
+        const d = this.session.data;
+        d.revealed = !d.revealed;
+        const btn = document.getElementById('toggleWordBtn');
+        if (btn) btn.textContent = d.revealed ? `الكلمة: ${d.word} (إخفاء)` : '👁️ إظهار الكلمة للرسام';
+      },
+
+      initCanvas() {
+        const canvas = document.getElementById('drawCanvas');
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width || 500;
+        canvas.height = 230;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        this.session.data.ctx = ctx;
+        this.session.data.canvas = canvas;
+        this.session.data.history = [canvas.toDataURL()];
+
+        let drawing = false;
+        const getPos = (e) => {
+          const r = canvas.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          return { x: clientX - r.left, y: clientY - r.top };
+        };
+        const start = (e) => {
+          e.preventDefault();
+          drawing = true;
+          const pos = getPos(e);
+          ctx.beginPath();
+          ctx.moveTo(pos.x, pos.y);
+        };
+        const move = (e) => {
+          if (!drawing) return;
+          e.preventDefault();
+          const pos = getPos(e);
+          ctx.strokeStyle = this.session.data.color;
+          ctx.lineWidth = this.session.data.size;
+          ctx.lineTo(pos.x, pos.y);
+          ctx.stroke();
+        };
+        const end = () => {
+          if (!drawing) return;
+          drawing = false;
+          this.session.data.history.push(canvas.toDataURL());
+        };
+
+        canvas.addEventListener('mousedown', start);
+        canvas.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', end);
+        canvas.addEventListener('touchstart', start, { passive: false });
+        canvas.addEventListener('touchmove', move, { passive: false });
+        canvas.addEventListener('touchend', end);
+      },
+
+      setBrushColor(c, s = 5) {
+        this.session.data.color = c;
+        this.session.data.size = s;
+      },
+
+      undoCanvas() {
+        const d = this.session.data;
+        if (!d.history || d.history.length <= 1) return;
+        d.history.pop();
+        const img = new Image();
+        img.onload = () => d.ctx.drawImage(img, 0, 0);
+        img.src = d.history[d.history.length - 1];
+      },
+
+      clearCanvas() {
+        const d = this.session.data;
+        if (!d.ctx) return;
+        d.ctx.fillStyle = '#FFFFFF';
+        d.ctx.fillRect(0, 0, d.canvas.width, d.canvas.height);
+        d.history.push(d.canvas.toDataURL());
+      },
+
+      scoreDrawGuess(guesserId) {
+        const guesser = this.session.players.find(p => p.id === guesserId);
+        if (guesser) guesser.score += 120;
+        this.session.data.drawer.score += 100;
+        App.toast(`رائع! نقاط للرسام و ${guesser.name}`, 'teal');
+        this.nextDrawRound();
+      },
+
+      nextDrawRound() {
+        this.session.round++;
+        if (this.session.round >= this.session.players.length) return this.finishGame('فنان اللمة');
+        this.playDrawAndGuess();
+      },
+
+      /* --- تحدي الكلمات --- */
+      playWordChallenge() {
+        const sets = [
+          { letters: ['م', 'ل', 'ع', 'ب', 'س', 'ر', 'ة'] },
+          { letters: ['ق', 'م', 'ر', 'س', 'م', 'ا', 'ء'] },
+          { letters: ['ك', 'ت', 'ا', 'ب', 'ن', 'و', 'ر'] }
+        ];
+        const p = this.session.players[this.session.round % this.session.players.length];
+        const set = sets[this.session.round % sets.length];
+        const used = [];
+
+        App.openModal(`
+          ${this.renderHeader(`دور: ${p.name}`)}
+          <div class="space-y-4 text-center">
+            <p class="text-xs font-bold text-slate-600">كوّن كلمات عربية من الحروف التالية (30 نقطة لكل حرف، ولا يُسمح بالتكرار):</p>
+            <div class="flex justify-center flex-wrap gap-2">
+              ${set.letters.map(l => `<span class="w-11 h-11 rounded-2xl bg-purple-600 text-white font-black text-xl flex items-center justify-center shadow">${l}</span>`).join('')}
+            </div>
+            <div class="flex gap-2">
+              <input id="wordInput" placeholder="اكتب كلمة..." class="flex-1 px-4 py-3 rounded-2xl border-2 border-slate-300 font-black text-center" />
+              <button onclick="Games.checkWordEntry()" class="btn-3d btn-teal px-5 rounded-2xl font-black">إضافة</button>
+            </div>
+            <div id="usedWordsList" class="flex flex-wrap justify-center gap-1.5 min-h-[32px]"></div>
+            <button onclick="Games.nextWordPlayer()" class="btn-3d btn-purple w-full py-3 rounded-2xl font-black">إنهاء الدور</button>
+          </div>
+        `);
+        this.session.data = { set, used, player: p };
+      },
+
+      checkWordEntry() {
+        const inp = document.getElementById('wordInput');
+        const w = inp.value.trim();
+        inp.value = '';
+        if (w.length < 2) return App.toast('أدخل كلمة من حرفين أو أكثر', 'amber');
+        const d = this.session.data;
+        if (d.used.includes(w)) return App.toast('الكلمة مكررة في هذه الجولة!', 'rose');
+        const allowed = d.set.letters;
+        const charsOk = [...w].every(ch => allowed.includes(ch));
+        if (!charsOk) return App.toast('استخدم الحروف المعروضة فقط!', 'rose');
+        d.used.push(w);
+        const pts = w.length * 30;
+        d.player.score += pts;
+        const box = document.getElementById('usedWordsList');
+        if (box) box.innerHTML = d.used.map(x => `<span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-black text-xs">${x} (+${x.length * 30})</span>`).join('');
+        App.toast(`✅ ${w} (+${pts} نقطة)`, 'teal');
+      },
+
+      nextWordPlayer() {
+        this.session.round++;
+        if (this.session.round >= this.session.players.length) return this.finishGame('سيد الكلمات');
+        this.playWordChallenge();
+      },
+
+      /* --- المحققون / لغز الغرفة المغلقة --- */
+      playDetective() {
+        const cases = App.state.contentBank.cases;
+        const c = cases[this.session.round % cases.length];
+        App.openModal(`
+          ${this.renderHeader('فريق التحقيق')}
+          <div class="space-y-3">
+            <div class="bg-slate-900 text-white p-4 rounded-2xl">
+              <div class="text-xs text-amber-400 font-bold">ملف قضية #${this.session.round + 1}</div>
+              <h3 class="text-lg font-black mt-0.5">${c.title}</h3>
+              <p class="text-xs text-slate-300 mt-1 font-bold leading-relaxed">${c.summary}</p>
+            </div>
+            <div class="bg-amber-50 border-2 border-amber-200 p-3 rounded-2xl space-y-1">
+              <div class="text-xs font-black text-amber-900">🔍 الأدلة:</div>
+              ${c.clues.map(cl => `<div class="text-xs font-bold text-slate-700">• ${cl}</div>`).join('')}
+            </div>
+            <div class="space-y-2">
+              <div class="text-xs font-black text-slate-700">🗣️ المشتبه بهم:</div>
+              ${c.suspects.map((s, idx) => `
+                <div class="p-3 rounded-2xl border-2 border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <div class="font-black text-sm text-purple-900">${s.name}</div>
+                    <div class="text-xs text-slate-600 font-bold">«${s.statement}»</div>
+                  </div>
+                  <button onclick="Games.accuseSuspect(${idx})" class="btn-3d btn-rose px-3.5 py-2 rounded-xl text-xs font-black shrink-0">اتهام</button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `);
+        this.session.data = { currentCase: c };
+      },
+
+      accuseSuspect(idx) {
+        const c = this.session.data.currentCase;
+        if (idx === c.guiltyIndex) {
+          this.session.players.forEach(p => p.score += 200);
+          App.toast(`🎉 كشفتم الحقيقة! ${c.explanation}`, 'teal');
+        } else {
+          App.toast(`❌ اتهام غير صحيح! ${c.explanation}`, 'rose');
+        }
+        this.finishGame('المحقق العبقري');
+      },
+
+      /* --- تحدي الذاكرة --- */
+      playMemoryMatch() {
+        const icons = ['🦁', '🚀', '🍕', '⚽', '🎸', '👑'];
+        const deck = [...icons, ...icons].sort(() => Math.random() - 0.5).map((icon, idx) => ({ idx, icon, flipped: false, matched: false }));
+        this.session.data = { deck, open: [], turn: 0 };
+        this.renderMemoryBoard();
+      },
+
+      renderMemoryBoard() {
+        const d = this.session.data;
+        const p = this.session.players[d.turn % this.session.players.length];
+        App.openModal(`
+          ${this.renderHeader(`دور: ${p.name}`)}
+          <div class="grid grid-cols-4 gap-2.5 max-w-md mx-auto">
+            ${d.deck.map(card => `
+              <button onclick="Games.flipMemoryCard(${card.idx})" class="h-20 rounded-2xl font-black text-3xl flex items-center justify-center border-2 transition ${card.matched ? 'bg-emerald-100 border-emerald-400' : card.flipped ? 'bg-amber-100 border-amber-400' : 'btn-3d btn-purple text-white'}">
+                ${card.flipped || card.matched ? card.icon : '❓'}
+              </button>
+            `).join('')}
+          </div>
+        `);
+      },
+
+      flipMemoryCard(idx) {
+        const d = this.session.data;
+        const card = d.deck[idx];
+        if (card.flipped || card.matched || d.open.length >= 2) return;
+        card.flipped = true;
+        d.open.push(card);
+        this.renderMemoryBoard();
+
+        if (d.open.length === 2) {
+          const [c1, c2] = d.open;
+          if (c1.icon === c2.icon) {
+            c1.matched = c2.matched = true;
+            d.open = [];
+            this.session.players[d.turn % this.session.players.length].score += 100;
+            if (d.deck.every(c => c.matched)) return setTimeout(() => this.finishGame('ذاكرة حديدية'), 400);
+            this.renderMemoryBoard();
+          } else {
+            setTimeout(() => {
+              c1.flipped = c2.flipped = false;
+              d.open = [];
+              d.turn++;
+              this.renderMemoryBoard();
+            }, 650);
+          }
+        }
+      },
+
+      /* --- حرب العقول / سباق القوافل --- */
+      playMindStrategy() {
+        if (!this.session.data.regions) {
+          this.session.data.regions = [
+            { name: 'واحة النخيل', owner: null, pts: 120 },
+            { name: 'قلعة الحكمة', owner: null, pts: 150 },
+            { name: 'ميناء اللؤلؤ', owner: null, pts: 130 },
+            { name: 'مرصد النجوم', owner: null, pts: 160 },
+            { name: 'سوق التوابل', owner: null, pts: 110 },
+            { name: 'جسر السلام', owner: null, pts: 140 }
+          ];
+        }
+        const d = this.session.data;
+        if (d.regions.every(r => r.owner !== null)) return this.finishGame('القائد الاستراتيجي');
+        const p = this.session.players[this.session.round % this.session.players.length];
+
+        App.openModal(`
+          ${this.renderHeader(`دور: ${p.name}`)}
+          <div class="space-y-3">
+            <p class="text-xs font-bold text-slate-600">اختر منطقة لتطويرها وضم نقاطها بالتناوب:</p>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              ${d.regions.map((r, idx) => `
+                <button ${r.owner !== null ? 'disabled' : ''} onclick="Games.claimRegion(${idx})" class="p-3.5 rounded-2xl border-2 text-center ${r.owner !== null ? 'bg-slate-100 border-slate-200 opacity-75' : 'btn-3d btn-white hover:border-purple-500'}">
+                  <div class="font-black text-sm text-slate-900">${r.name}</div>
+                  <div class="text-xs font-extrabold text-amber-600 mt-1">+${r.pts} نقطة</div>
+                  <div class="text-[11px] font-bold mt-1 text-purple-700">${r.owner !== null ? r.owner : 'متاحة'}</div>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `);
+      },
+
+      claimRegion(idx) {
+        const p = this.session.players[this.session.round % this.session.players.length];
+        const r = this.session.data.regions[idx];
+        if (r.owner !== null) return;
+        r.owner = p.name;
+        p.score += r.pts;
+        this.session.round++;
+        this.playMindStrategy();
+      },
+
+      /* --- من أنا؟ / التمثيل الصامت --- */
+      playWhoAmI(isCharades = false) {
+        const list = App.state.contentBank.whoAmI;
+        if (this.session.round >= this.session.players.length) return this.finishGame(isCharades ? 'نجم التمثيل' : 'ملك التخمين');
+        const p = this.session.players[this.session.round];
+        const item = list[Math.floor(Math.random() * list.length)];
+        App.openModal(`
+          ${this.renderHeader(`دور: ${p.name}`)}
+          <div class="text-center space-y-4 py-3">
+            <div class="text-5xl">${isCharades ? '🤐' : '🎭'}</div>
+            <h3 class="text-xl font-black text-slate-900">
+              ${isCharades ? `يمثّل ${p.name} الكلمة بدون صوت!` : `يرفع ${p.name} الجهاز ليرى الباقون الكلمة ويسأل بـ «نعم أو لا»!`}
+            </h3>
+            <div class="bg-purple-900 text-white p-6 rounded-3xl shadow-lg">
+              <div class="text-xs text-amber-300 font-bold">الفئة: ${item.cat}</div>
+              <div class="text-3xl font-black mt-1">${item.name}</div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <button onclick="Games.session.players[${this.session.round}].score += 150; Games.session.round++; Games.playWhoAmI(${isCharades});" class="btn-3d btn-teal py-3 rounded-2xl font-black">✅ نجح (+150)</button>
+              <button onclick="Games.session.round++; Games.playWhoAmI(${isCharades});" class="btn-3d btn-white py-3 rounded-2xl font-black">⏭️ التالي</button>
+            </div>
+          </div>
+        `);
+      },
+
+      /* --- تحدي السرعة / قنبلة الأسئلة / مبارزة الألوان --- */
+      playSpeedReflex() {
+        if (this.session.round >= this.session.players.length) return this.finishGame('البرق الخاطف');
+        const p = this.session.players[this.session.round];
+        const colors = [
+          { name: 'أحمر', hex: '#DC2626' },
+          { name: 'أزرق', hex: '#2563EB' },
+          { name: 'أخضر', hex: '#16A34A' },
+          { name: 'أصفر', hex: '#D97706' }
+        ];
+        const wordObj = colors[Math.floor(Math.random() * colors.length)];
+        const inkObj = colors[Math.floor(Math.random() * colors.length)];
+        const start = Date.now();
+
+        App.openModal(`
+          ${this.renderHeader(`تحدي التركيز: ${p.name}`)}
+          <div class="text-center space-y-4">
+            <p class="text-sm font-black text-slate-700">⚡ اختر <u>لون الخط</u> المكتوبة به الكلمة بسرعة:</p>
+            <div class="py-6 rounded-3xl bg-slate-100 border-2 border-slate-200">
+              <span style="color:${inkObj.hex}" class="text-5xl font-black">${wordObj.name}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5">
+              ${colors.map(c => `
+                <button onclick="Games.resolveSpeed('${c.name}', '${inkObj.name}', ${start})" class="btn-3d btn-white py-3 rounded-2xl font-black text-base">${c.name}</button>
+              `).join('')}
+            </div>
+          </div>
+        `);
+      },
+
+      resolveSpeed(chosen, correct, startTime) {
+        const p = this.session.players[this.session.round];
+        if (chosen === correct) {
+          const bonus = Math.max(50, 200 - Math.floor((Date.now() - startTime) / 25));
+          p.score += bonus;
+          App.toast(`⚡ سرعة رائعة! +${bonus} نقطة`, 'teal');
+        } else {
+          App.toast('❌ اللون الصحيح كان: ' + correct, 'rose');
+        }
+        this.session.round++;
+        this.playSpeedReflex();
+      },
+
+      /* --- المغامرة الجماعية --- */
+      playCoopAdventure() {
+        const stages = [
+          { title: 'بوابة الكهف المضيء', desc: 'أمام الفريق رافعات بأسماء معادن: الذهبية، الفضية، والنحاسية. النقش يشير إلى المعدن الأغلى.', opts: ['الرافعة الذهبية', 'الرافعة الفضية', 'الرافعة النحاسية'], ans: 0 },
+          { title: 'جسر الألغاز المعلق', desc: 'تعاونوا للإجابة: ما هو الشيء الذي يزداد كلما أخذنا منه؟', opts: ['الحفرة', 'الصندوق', 'الوقت'], ans: 0 },
+          { title: 'خزنة الكنز الأخيرة', desc: 'اجمعوا: عدد أركان المثلث + عدد أيام الأسبوع =', opts: ['9', '10', '11'], ans: 1 }
+        ];
+        if (this.session.round >= stages.length) return this.finishGame('أبطال المغامرة');
+        const st = stages[this.session.round];
+        App.openModal(`
+          ${this.renderHeader(`مرحلة ${this.session.round + 1} من ${stages.length}`)}
+          <div class="space-y-4">
+            <div class="bg-teal-900 text-white p-5 rounded-3xl">
+              <h3 class="text-xl font-black text-amber-300">🗺️ ${st.title}</h3>
+              <p class="text-sm mt-2 font-bold leading-relaxed">${st.desc}</p>
+            </div>
+            <div class="space-y-2">
+              ${st.opts.map((o, idx) => `
+                <button onclick="Games.stepCoop(${idx === st.ans})" class="btn-3d btn-white w-full p-3.5 rounded-2xl font-black text-right">${o}</button>
+              `).join('')}
+            </div>
+          </div>
+        `);
+      },
+
+      stepCoop(ok) {
+        if (ok) {
+          this.session.players.forEach(p => p.score += 120);
+          App.toast('🗝️ أحسنتم! تجاوزتم المرحلة معاً (+120 للجميع)', 'teal');
+          this.session.round++;
+          this.playCoopAdventure();
+        } else {
+          App.toast('⚠️ جرّبوا خياراً آخر معاً', 'amber');
+        }
+      },
+
+      /* --- بقية الألعاب التفاعلية --- */
+      playProverbs() { this.playSimpleChoice(App.state.contentBank.proverbs, 'start', 'opts', 'ans', 'حكيم الأمثال'); },
+      playRiddles() { this.playSimpleChoice(App.state.contentBank.riddles, 'q', 'opts', 'ans', 'قاهر الفوازير'); },
+      playWhoSaidIt() { this.playSimpleChoice(App.state.contentBank.quotes, 'quote', 'opts', 'ans', 'خبير المقولات'); },
+
+      playSimpleChoice(list, qKey, optsKey, ansKey, badge) {
+        if (this.session.round >= Math.min(5, list.length)) return this.finishGame(badge);
+        const item = list[this.session.round];
+        const p = this.session.players[this.session.round % this.session.players.length];
+        App.openModal(`
+          ${this.renderHeader(`دور: ${p.name}`)}
+          <div class="space-y-4">
+            <div class="bg-purple-50 border-2 border-purple-200 p-5 rounded-3xl text-center">
+              <h3 class="text-xl font-black text-slate-900">${item[qKey]}</h3>
+            </div>
+            <div class="space-y-2">
+              ${item[optsKey].map((o, idx) => `
+                <button onclick="Games.answerSimple(${idx === item[ansKey]}, '${badge}')" class="btn-3d btn-white w-full p-3.5 rounded-2xl font-black text-right">${o}</button>
+              `).join('')}
+            </div>
+          </div>
+        `);
+        this.session.data = { list, qKey, optsKey, ansKey, badge };
+      },
+
+      answerSimple(isRight, badge) {
+        const p = this.session.players[this.session.round % this.session.players.length];
+        if (isRight) { p.score += 120; App.toast('✅ إجابة صحيحة! +120', 'teal'); }
+        else { App.toast('❌ إجابة غير صحيحة', 'rose'); }
+        this.session.round++;
+        const d = this.session.data;
+        this.playSimpleChoice(d.list, d.qKey, d.optsKey, d.ansKey, badge);
+      },
+
+      playTrueFalse() {
+        const list = App.state.contentBank.trueFalse;
+        if (this.session.round >= list.length) return this.finishGame('كاشف الحقائق');
+        const item = list[this.session.round];
+        const p = this.session.players[this.session.round % this.session.players.length];
+        App.openModal(`
+          ${this.renderHeader(`دور: ${p.name}`)}
+          <div class="space-y-4 text-center">
+            <div class="bg-slate-900 text-white p-6 rounded-3xl text-lg font-black">${item.s}</div>
+            <div class="grid grid-cols-2 gap-3">
+              <button onclick="Games.resolveTF(true, ${item.ans})" class="btn-3d btn-teal py-4 rounded-2xl font-black text-lg">✅ صح</button>
+              <button onclick="Games.resolveTF(false, ${item.ans})" class="btn-3d btn-rose py-4 rounded-2xl font-black text-lg">❌ غلط</button>
+            </div>
+          </div>
+        `);
+      },
+
+      resolveTF(choice, actual) {
+        const p = this.session.players[this.session.round % this.session.players.length];
+        if (choice === actual) { p.score += 100; App.toast('صحيح! +100', 'teal'); }
+        else { App.toast('خطأ!', 'rose'); }
+        this.session.round++;
+        this.playTrueFalse();
+      },
+
+      playEstimate() {
+        const list = App.state.contentBank.estimates;
+        const item = list[this.session.round % list.length];
+        App.openModal(`
+          ${this.renderHeader('تخمين الأرقام')}
+          <div class="space-y-3">
+            <div class="bg-amber-50 border-2 border-amber-200 p-4 rounded-2xl font-black text-base text-slate-900">${item.q}</div>
+            <div class="space-y-2">
+              ${this.session.players.map((p, idx) => `
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-black text-sm">${p.name}:</span>
+                  <input id="est_${idx}" type="number" placeholder="${item.unit}" class="w-36 px-3 py-2 rounded-xl border-2 border-slate-200 font-bold text-center" />
+                </div>
+              `).join('')}
+            </div>
+            <button onclick="Games.resolveEstimate(${item.target}, '${item.unit}')" class="btn-3d btn-purple w-full py-3 rounded-2xl font-black">كشف الرقم الصحيح</button>
+          </div>
+        `);
+      },
+
+      resolveEstimate(target, unit) {
+        let bestDiff = Infinity;
+        let winner = this.session.players[0];
+        this.session.players.forEach((p, idx) => {
+          const val = Number(document.getElementById(`est_${idx}`).value || 0);
+          const diff = Math.abs(target - val);
+          if (diff < bestDiff) { bestDiff = diff; winner = p; }
+        });
+        winner.score += 180;
+        App.toast(`الرقم الصحيح: ${target} ${unit} — الأقرب: ${winner.name} (+180)`, 'teal');
+        this.finishGame('خبير التقدير');
+      },
+
+      playWheel() {
+        const p = this.session.players[this.session.round % this.session.players.length];
+        App.openModal(`
+          ${this.renderHeader(`دور: ${p.name}`)}
+          <div class="text-center space-y-4 py-4">
+            <div id="wheelIcon" class="text-7xl transition-transform duration-700">🎡</div>
+            <div id="wheelResult" class="text-lg font-black text-purple-900">أدر العجلة واكتشف نتيجتك!</div>
+            <button onclick="Games.spinWheel()" class="btn-3d btn-amber px-8 py-4 rounded-2xl font-black text-lg">🎲 أدر العجلة الآن</button>
+          </div>
+        `);
+      },
+
+      spinWheel() {
+        const prizes = [
+          { text: '🎉 +200 نقطة ذهبية!', pts: 200 },
+          { text: '😂 قل نكتة أو معلومة طريفة واكسب +150 نقطة!', pts: 150 },
+          { text: '⚡ +100 نقطة سريعة!', pts: 100 },
+          { text: '👏 تحية للجميع واكسب +120 نقطة!', pts: 120 }
+        ];
+        const pick = prizes[Math.floor(Math.random() * prizes.length)];
+        const p = this.session.players[this.session.round % this.session.players.length];
+        p.score += pick.pts;
+        const w = document.getElementById('wheelIcon');
+        if (w) w.style.transform = 'rotate(720deg)';
+        const res = document.getElementById('wheelResult');
+        if (res) res.textContent = pick.text;
+        this.session.round++;
+        setTimeout(() => {
+          if (this.session.round >= this.session.players.length) this.finishGame('محظوظ اللمة');
+          else this.playWheel();
+        }, 1200);
+      },
+
+      playColorCode() {
+        if (!this.session.data.secretCode) {
+          const palette = ['🔴', '🔵', '🟢', '🟡'];
+          this.session.data.secretCode = [0, 1, 2, 3].map(() => palette[Math.floor(Math.random() * palette.length)]);
+          this.session.data.tries = 0;
+        }
+        App.openModal(`
+          ${this.renderHeader(`محاولة ${this.session.data.tries + 1} من 6`)}
+          <div class="space-y-4 text-center">
+            <p class="text-xs font-bold text-slate-600">اختر 4 ألوان بالترتيب لاكتشاف الشيفرة:</p>
+            <div class="grid grid-cols-4 gap-2">
+              ${[0, 1, 2, 3].map(i => `
+                <select id="cc_${i}" class="p-3 rounded-2xl border-2 border-slate-300 text-2xl text-center font-black">
+                  <option value="🔴">🔴</option>
+                  <option value="🔵">🔵</option>
+                  <option value="🟢">🟢</option>
+                  <option value="🟡">🟡</option>
+                </select>
+              `).join('')}
+            </div>
+            <button onclick="Games.checkColorCode()" class="btn-3d btn-purple w-full py-3 rounded-2xl font-black">فحص الشيفرة</button>
+          </div>
+        `);
+      },
+
+      checkColorCode() {
+        const guess = [0, 1, 2, 3].map(i => document.getElementById(`cc_${i}`).value);
+        const secret = this.session.data.secretCode;
+        let exact = 0;
+        guess.forEach((g, i) => { if (g === secret[i]) exact++; });
+        this.session.data.tries++;
+        if (exact === 4) {
+          this.session.players.forEach(p => p.score += 200);
+          App.toast('🎯 تم اكتشاف الشيفرة بالكامل!', 'teal');
+          return this.finishGame('فكّاك الشيفرات');
+        }
+        if (this.session.data.tries >= 6) {
+          App.toast(`انتهت المحاولات! الشيفرة: ${secret.join(' ')}`, 'rose');
+          return this.finishGame('محاول شجاع');
+        }
+        App.toast(`تطابق ${exact} ألوان في مكانها الصحيح`, 'amber');
+        this.playColorCode();
+      },
+
+      playMentalMath() {
+        if (this.session.round >= this.session.players.length) return this.finishGame('عبقري الحساب');
+        const p = this.session.players[this.session.round];
+        const a = Math.floor(12 + Math.random() * 25);
+        const b = Math.floor(6 + Math.random() * 19);
+        const ans = a + b;
+        App.openModal(`
+          ${this.renderHeader(`دور: ${p.name}`)}
+          <div class="text-center space-y-4">
+            <div class="text-4xl font-black text-purple-900 py-4 bg-purple-50 rounded-3xl" dir="ltr">${a} + ${b} = ?</div>
+            <input id="mathAns" type="number" placeholder="الإجابة" class="w-40 mx-auto px-4 py-3 rounded-2xl border-2 border-slate-300 font-black text-center text-xl" />
+            <button onclick="Games.checkMath(${ans})" class="btn-3d btn-teal w-full py-3 rounded-2xl font-black">تأكيد</button>
+          </div>
+        `);
+      },
+
+      checkMath(ans) {
+        const val = Number(document.getElementById('mathAns').value);
+        const p = this.session.players[this.session.round];
+        if (val === ans) { p.score += 130; App.toast('🎉 صحيح! +130', 'teal'); }
+        else { App.toast(`❌ الناتج الصحيح: ${ans}`, 'rose'); }
+        this.session.round++;
+        this.playMentalMath();
+      },
+
+      playConfessionChair() {
+        const list = App.state.contentBank.confessions;
+        if (this.session.round >= this.session.players.length) return this.finishGame('صريح اللمة');
+        const p = this.session.players[this.session.round];
+        const q = list[this.session.round % list.length];
+        App.openModal(`
+          ${this.renderHeader(`دور: ${p.name}`)}
+          <div class="text-center space-y-4 py-3">
+            <div class="text-5xl">🪑</div>
+            <div class="bg-rose-50 border-2 border-rose-200 p-5 rounded-3xl font-black text-lg text-slate-900">${q}</div>
+            <button onclick="Games.session.players[${this.session.round}].score += 150; Games.session.round++; Games.playConfessionChair();" class="btn-3d btn-purple w-full py-3.5 rounded-2xl font-black">👏 أجاب (+150 نقطة)</button>
+          </div>
+        `);
+      },
+
+      playMagicLink() {
+        const list = App.state.contentBank.links;
+        const item = list[this.session.round % list.length];
+        App.openModal(`
+          ${this.renderHeader('الرابط العجيب')}
+          <div class="text-center space-y-4">
+            <p class="text-xs font-bold text-slate-600">ما هو الرابط المشترك بين هذه الكلمات؟</p>
+            <div class="flex justify-center gap-2">
+              ${item.words.map(w => `<span class="px-4 py-3 rounded-2xl bg-amber-100 border-2 border-amber-300 font-black text-base">${w}</span>`).join('')}
+            </div>
+            <div id="linkAnsBox" class="hidden p-3 rounded-2xl bg-teal-50 border-2 border-teal-300 font-black text-teal-900">الرابط: ${item.ans}</div>
+            <button onclick="document.getElementById('linkAnsBox').classList.remove('hidden')" class="btn-3d btn-white w-full py-2.5 rounded-2xl font-black text-sm">👁️ إظهار الرابط</button>
+            <div class="flex flex-wrap justify-center gap-2">
+              ${this.session.players.map(p => `<button onclick="Games.session.players[${p.id}].score += 150; Games.finishGame('صائد الروابط');" class="btn-3d btn-teal px-3 py-2 rounded-xl text-xs font-black">فاز: ${p.name}</button>`).join('')}
+            </div>
+          </div>
+        `);
+      },
+
+      playAutobusComplete() {
+        const letters = ['م', 'س', 'ع', 'ف', 'ق', 'ب', 'ن'];
+        const letter = letters[Math.floor(Math.random() * letters.length)];
+        App.openModal(`
+          ${this.renderHeader('حروف وأسماء')}
+          <div class="space-y-3 text-center">
+            <div class="w-16 h-16 rounded-3xl bg-amber-400 text-slate-950 font-black text-4xl flex items-center justify-center mx-auto shadow">${letter}</div>
+            <p class="text-xs font-bold text-slate-600">أول من يكمل الفئات بحرف <strong>(${letter})</strong> يحسم الجولة!</p>
+            <div class="flex flex-wrap justify-center gap-2 pt-2">
+              ${this.session.players.map(p => `<button onclick="Games.session.players[${p.id}].score += 200; Games.finishGame('بطل الحروف');" class="btn-3d btn-purple px-4 py-2.5 rounded-2xl text-xs font-black">فاز: ${p.name}</button>`).join('')}
+            </div>
+          </div>
+        `);
+      },
+
+      playOddOneOut() {
+        const list = App.state.contentBank.oddOneOut;
+        if (this.session.round >= list.length) return this.finishGame('قناص الدخيل');
+        const item = list[this.session.round];
+        const p = this.session.players[this.session.round % this.session.players.length];
+        App.openModal(`
+          ${this.renderHeader(`دور: ${p.name}`)}
+          <div class="space-y-3 text-center">
+            <p class="text-sm font-black">اختر الكلمة المختلفة عن البقية:</p>
+            <div class="grid grid-cols-2 gap-2.5">
+              ${item.items.map((w, idx) => `<button onclick="Games.resolveOdd(${idx === item.ans})" class="btn-3d btn-white py-4 rounded-2xl font-black text-base">${w}</button>`).join('')}
+            </div>
+          </div>
+        `);
+      },
+
+      resolveOdd(ok) {
+        const p = this.session.players[this.session.round % this.session.players.length];
+        if (ok) { p.score += 120; App.toast('أحسنت! +120', 'teal'); }
+        else { App.toast('إجابة غير صحيحة', 'rose'); }
+        this.session.round++;
+        this.playOddOneOut();
+      },
+
+      playNumberSequence() {
+        if (this.session.round >= this.session.players.length) return this.finishGame('ذاكرة الأرقام');
+        const p = this.session.players[this.session.round];
+        const seq = String(Math.floor(10000 + Math.random() * 89999));
+        App.openModal(`
+          ${this.renderHeader(`دور: ${p.name}`)}
+          <div class="text-center space-y-4">
+            <p class="text-xs font-bold text-slate-600">احفظ الرقم التالي ثم أعد كتابته:</p>
+            <div id="seqDisplay" class="text-4xl font-black tracking-widest text-purple-800 py-4 bg-purple-50 rounded-3xl" dir="ltr">${seq}</div>
+            <div id="seqInputArea" class="hidden space-y-3">
+              <input id="seqGuess" type="number" placeholder="أدخل الرقم" class="w-48 mx-auto px-4 py-3 rounded-2xl border-2 border-slate-300 font-black text-center text-xl" dir="ltr" />
+              <button onclick="Games.checkSeq('${seq}')" class="btn-3d btn-teal w-full py-3 rounded-2xl font-black">تحقق</button>
+            </div>
+          </div>
+        `);
+        setTimeout(() => {
+          const disp = document.getElementById('seqDisplay');
+          const area = document.getElementById('seqInputArea');
+          if (disp) disp.textContent = '•••••';
+          if (area) area.classList.remove('hidden');
+        }, 2800);
+      },
+
+      checkSeq(seq) {
+        const g = document.getElementById('seqGuess').value.trim();
+        const p = this.session.players[this.session.round];
+        if (g === seq) { p.score += 160; App.toast('🎉 ممتاز! +160', 'teal'); }
+        else { App.toast(`❌ الرقم كان ${seq}`, 'rose'); }
+        this.session.round++;
+        this.playNumberSequence();
+      }
+    };
+
+    /* =====================================================================
+       8. عرض الصفحات (Home, Games, Plans, Account, About, Legal, Admin)
+       ===================================================================== */
+    App.render = function () {
+      const main = document.getElementById('appMain');
+      const user = this.getCurrentUser();
+
+      document.getElementById('brandNameHeader').textContent = this.state.siteSettings.platformName.split('-')[0].trim();
+      document.getElementById('brandNameFooter').textContent = this.state.siteSettings.platformName;
+
+      const adminBtn = document.getElementById('adminDesktopBtn');
+      if (adminBtn) {
+        if (user && user.role === 'admin') adminBtn.classList.remove('hidden');
+        else adminBtn.classList.add('hidden');
+      }
+
+      const headerArea = document.getElementById('headerUserArea');
+      if (user) {
+        headerArea.innerHTML = `
+          ${user.role === 'admin' ? `<button onclick="App.navigate('admin')" class="md:hidden bg-rose-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-black">🛡️ الإدارة</button>` : ''}
+          <button onclick="App.navigate('account')" class="flex items-center gap-2 bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 px-3 py-1.5 rounded-2xl transition">
+            <span class="text-lg">${user.avatar}</span>
+            <span class="font-black text-xs text-purple-900 max-w-[95px] truncate">${user.name}</span>
+          </button>
+        `;
+      } else {
+        headerArea.innerHTML = `
+          <button onclick="App.openAuthModal('login')" class="btn-3d btn-purple px-4 py-2 rounded-2xl font-black text-xs sm:text-sm">دخول / حساب جديد</button>
+        `;
+      }
+
+      document.querySelectorAll('[data-nav]').forEach(el => {
+        const active = el.getAttribute('data-nav') === this.route;
+        if (el.classList.contains('nav-link')) {
+          el.className = active
+            ? 'nav-link px-3.5 py-2 rounded-xl font-black text-sm bg-purple-600 text-white shadow'
+            : 'nav-link px-3.5 py-2 rounded-xl font-extrabold text-sm text-slate-700 hover:bg-purple-50';
+        }
+        if (el.classList.contains('mob-nav')) {
+          el.className = active
+            ? 'mob-nav flex flex-col items-center justify-center gap-0.5 text-xs font-black text-purple-700 bg-purple-50 border-t-2 border-purple-600'
+            : 'mob-nav flex flex-col items-center justify-center gap-0.5 text-xs font-extrabold text-slate-500';
+        }
+      });
+
+      if (this.state.siteSettings.maintenanceMode && (!user || user.role !== 'admin')) {
+        main.innerHTML = `
+          <div class="card-sj p-10 text-center max-w-xl mx-auto my-12 space-y-4">
+            <div class="text-6xl">🛠️</div>
+            <h1 class="text-2xl font-black text-purple-900">المنصة في وضع الصيانة</h1>
+            <p class="text-slate-600 text-sm font-bold">نعمل على تحديث المحتوى والألعاب وسنعود قريباً.</p>
+            <button onclick="App.openAuthModal('login')" class="btn-3d btn-purple px-6 py-2.5 rounded-2xl font-black text-xs">دخول الإدارة</button>
+          </div>
+        `;
+        return;
+      }
+
+      switch (this.route) {
+        case 'home': main.innerHTML = this.viewHome(); break;
+        case 'games': main.innerHTML = this.viewGames(); break;
+        case 'plans': main.innerHTML = this.viewPlans(); break;
+        case 'account': main.innerHTML = this.viewAccount(); break;
+        case 'about': main.innerHTML = this.viewAbout(); break;
+        case 'admin': main.innerHTML = this.viewAdmin(); break;
+        case 'legal-terms':
+        case 'legal-privacy':
+        case 'legal-refund':
+        case 'contact':
+          main.innerHTML = this.viewLegal(this.route); break;
+        default: main.innerHTML = this.viewHome();
+      }
+    };
+
+    App.viewHome = function () {
+      const popularGames = this.state.games.filter(g => g.active && g.popular).slice(0, 6);
+      const tenGames = this.state.games.filter(g => g.active).slice(0, 10);
+      return `
+        <div class="space-y-12 fade-in">
+          <!-- القسم الترحيبي الرئيسي -->
+          <section class="rounded-[2rem] bg-gradient-to-br from-purple-700 via-indigo-800 to-slate-900 text-white p-6 sm:p-12 shadow-xl border-b-8 border-purple-950">
+            <div class="max-w-3xl space-y-5">
+              <div class="inline-flex flex-wrap items-center gap-2 bg-white/15 px-4 py-1.5 rounded-full text-xs sm:text-sm font-extrabold text-amber-300 border border-white/20">
+                <span>🎲 مكتبة ألعاب عائلية وجماعية</span>
+                <span>•</span>
+                <span>📱 جهاز واحد وبدون إنترنت Offline</span>
+              </div>
+              <h1 class="text-3xl sm:text-5xl font-black leading-tight">
+                اجمع العيلة والأصحاب حول جهاز واحد.. وابدأ المتعة!
+              </h1>
+              <p class="text-purple-100 text-sm sm:text-lg font-bold leading-relaxed max-w-2xl">
+                مرحباً بك في <strong>${this.state.siteSettings.platformName}</strong>. اشتراك واحد يفتح لك 30 لعبة جماعية وتفاعلية تتناوبون عليها على نفس الهاتف أو الكمبيوتر وتعمل Offline بعد التحميل والتفعيل.
+              </p>
+              <div class="flex flex-wrap gap-3 pt-2">
+                <button onclick="App.navigate('games')" class="btn-3d btn-amber px-7 py-4 rounded-2xl font-black text-base sm:text-lg">🎮 اكتشف الألعاب</button>
+                <button onclick="App.navigate('plans')" class="btn-3d btn-teal px-7 py-4 rounded-2xl font-black text-base sm:text-lg">💎 اشترك الآن</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- الألعاب الأكثر شعبية -->
+          <section class="space-y-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-2xl font-black text-slate-900">🔥 الألعاب الأكثر شعبية</h2>
+                <p class="text-xs sm:text-sm text-slate-500 font-bold">الأكثر اختياراً في التجمعات العائلية</p>
+              </div>
+              <button onclick="App.navigate('games')" class="text-purple-700 font-black text-sm underline">كل الألعاب (30) ←</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              ${popularGames.map(g => this.renderGameCard(g)).join('')}
+            </div>
+          </section>
+
+          <!-- عرض الألعاب العشر الأولى -->
+          <section class="space-y-5">
+            <div class="flex items-center justify-between">
+              <h2 class="text-2xl font-black text-slate-900">🎯 الألعاب العشر الرئيسية</h2>
+              <button onclick="App.navigate('games')" class="btn-3d btn-white px-4 py-2 rounded-xl text-xs font-black">عرض جميع الـ 30 لعبة</button>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              ${tenGames.map(g => `
+                <button onclick="App.launchGame('${g.id}')" class="card-sj p-4 text-center hover:-translate-y-1 transition">
+                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-br ${g.color} text-white text-2xl flex items-center justify-center mx-auto mb-2 shadow">${g.icon}</div>
+                  <div class="font-black text-xs sm:text-sm text-slate-900 truncate">${g.title}</div>
+                  <div class="text-[11px] font-bold text-slate-500 mt-0.5">${g.players}</div>
+                </button>
+              `).join('')}
+            </div>
+          </section>
+
+          <!-- مميزات الاشتراك + شرح اللعب على جهاز واحد + طريقة الاشتراك -->
+          <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="card-sj p-6 space-y-3">
+              <h3 class="text-lg font-black text-purple-900">✨ مميزات الاشتراك الموحد</h3>
+              <ul class="space-y-2 text-xs sm:text-sm font-bold text-slate-700">
+                <li>✔ فتح كامل لـ 30 لعبة عائلية متنوعة.</li>
+                <li>✔ تشغيل محلي Offline دون اتصال أثناء اللعب.</li>
+                <li>✔ حفظ النقاط والشارات وسجل المباريات.</li>
+                <li>✔ مناسب للأطفال والشباب والكبار.</li>
+              </ul>
+            </div>
+
+            <div class="card-sj p-6 space-y-3">
+              <h3 class="text-lg font-black text-teal-900">📱 اللعب على جهاز واحد</h3>
+              <ul class="space-y-2 text-xs sm:text-sm font-bold text-slate-700">
+                <li>1. يجلس اللاعبون معاً أمام نفس الجهاز.</li>
+                <li>2. يتم إدخال الأسماء (من 2 إلى 8 حسب اللعبة).</li>
+                <li>3. تناوب سلس وشاشات سرية لتمرير الجهاز.</li>
+                <li>4. لا توجد غرف أونلاين أو دعوات إلكترونية.</li>
+              </ul>
+            </div>
+
+            <div class="card-sj p-6 space-y-3">
+              <h3 class="text-lg font-black text-rose-800">💳 الاشتراك عبر فودافون كاش</h3>
+              <ul class="space-y-2 text-xs sm:text-sm font-bold text-slate-700">
+                <li>1. اختر باقتك (شهرية، 3 أشهر، أو سنوية).</li>
+                <li>2. حوّل المبلغ إلى رقم فودافون كاش الموضح.</li>
+                <li>3. ارفع صورة الإيصال ورقم الهاتف المحوّل منه.</li>
+                <li>4. يُفعّل الاشتراك بعد مراجعة الإدارة وتأكيد الدفع.</li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- الأسئلة الشائعة -->
+          <section class="card-sj p-6 sm:p-8 space-y-4">
+            <h3 class="text-2xl font-black text-slate-900">❓ الأسئلة الشائعة</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div class="p-4 rounded-2xl bg-slate-50 border">
+                <div class="font-black text-purple-900 mb-1">كيف يعمل نظام Offline بعد التفعيل؟</div>
+                <p class="text-slate-600 font-bold">نحتاج اتصالاً بالإنترنت عند التسجيل وإرسال الدفع والتحقق من الاشتراك، وبعدها تعمل الألعاب محلياً دون اتصال.</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-slate-50 border">
+                <div class="font-black text-purple-900 mb-1">هل يتم تفعيل الاشتراك تلقائياً بمجرد رفع الصورة؟</div>
+                <p class="text-slate-600 font-bold">لا، يبقى الطلب في حالة «قيد المراجعة» حتى تتحقق الإدارة من وصول التحويل وتوافق عليه.</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-slate-50 border">
+                <div class="font-black text-purple-900 mb-1">كم عدد اللاعبين في كل لعبة؟</div>
+                <p class="text-slate-600 font-bold">تتراوح الألعاب بين 2 إلى 8 لاعبين على نفس الجهاز حسب طبيعة كل لعبة.</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-slate-50 border">
+                <div class="font-black text-purple-900 mb-1">هل تُحذف إنجازاتي إذا انتهى الاشتراك؟</div>
+                <p class="text-slate-600 font-bold">لا يتم حذف بيانات حسابك أو نقاطك أو سجل نتائجك عند انتهاء الاشتراك.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      `;
+    };
+
+    App.renderGameCard = function (g) {
+      const unlocked = this.hasActiveAccess();
+      return `
+        <div class="card-sj p-5 flex flex-col justify-between gap-4">
+          <div>
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${g.color} text-white text-3xl flex items-center justify-center shadow-md shrink-0">${g.icon}</div>
+              <div class="flex flex-col items-end gap-1">
+                <span class="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[11px] font-black">${g.category}</span>
+                <span class="px-2 py-0.5 rounded-full ${unlocked ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'} text-[10px] font-black">
+                  ${unlocked ? '🔓 متاحة Offline' : '🔒 اشتراك مطلوب'}
+                </span>
+              </div>
+            </div>
+            <h3 class="text-lg font-black text-slate-900">${g.title}</h3>
+            <p class="text-xs text-slate-600 font-bold mt-1 leading-relaxed">${g.desc}</p>
+          </div>
+          <div class="space-y-3">
+            <div class="flex flex-wrap gap-1.5 text-[11px] font-extrabold text-slate-600">
+              <span class="bg-slate-100 px-2.5 py-1 rounded-lg">👥 ${g.players}</span>
+              <span class="bg-slate-100 px-2.5 py-1 rounded-lg">⏱️ ${g.duration}</span>
+              <span class="bg-slate-100 px-2.5 py-1 rounded-lg">📊 ${g.difficulty}</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="App.showGameDetails('${g.id}')" class="btn-3d btn-white py-2.5 rounded-xl font-black text-xs">التفاصيل</button>
+              <button onclick="App.launchGame('${g.id}')" class="col-span-2 btn-3d ${unlocked ? 'btn-teal' : 'btn-purple'} py-2.5 rounded-xl font-black text-xs">
+                ${unlocked ? '▶️ بدء اللعب' : '🔒 اشترك للعب'}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    };
+
+    App.showGameDetails = function (gameId) {
+      const g = this.state.games.find(x => x.id === gameId);
+      if (!g) return;
+      this.openModal(`
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br ${g.color} text-white text-4xl flex items-center justify-center shadow">${g.icon}</div>
+            <div>
+              <span class="text-xs font-black text-purple-700">${g.category}</span>
+              <h3 class="text-2xl font-black text-slate-900">${g.title}</h3>
+            </div>
+          </div>
+          <p class="text-sm text-slate-700 font-bold leading-relaxed">${g.desc}</p>
+          <div class="grid grid-cols-3 gap-2 text-center bg-slate-50 p-3 rounded-2xl border text-xs font-black">
+            <div>👥 ${g.players}</div>
+            <div>⏱️ ${g.duration}</div>
+            <div>📊 ${g.difficulty}</div>
+          </div>
+          <button onclick="App.launchGame('${g.id}')" class="btn-3d btn-teal w-full py-3.5 rounded-2xl font-black text-base">▶️ بدء اللعب الآن</button>
+        </div>
+      `);
+    };
+
+    App.viewGames = function () {
+      const categories = ['الكل', 'مسابقات', 'ذكاء وألغاز', 'ألعاب ضحك وتسلية', 'تحديات', 'تحقيق وغموض', 'ألعاب استراتيجية'];
+      const filtered = this.state.games.filter(g => {
+        if (!g.active) return false;
+        const matchCat = this.selectedCategory === 'الكل' || g.category === this.selectedCategory;
+        const q = this.searchQuery.trim().toLowerCase();
+        const matchQ = !q || g.title.toLowerCase().includes(q) || g.desc.toLowerCase().includes(q);
+        return matchCat && matchQ;
+      });
+
+      return `
+        <div class="space-y-6 fade-in">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-black text-slate-900">🎮 صفحة الألعاب (${filtered.length})</h1>
+              <p class="text-xs sm:text-sm text-slate-500 font-bold">اختر لعبتك والعب مع عائلتك أو أصدقائك على جهاز واحد</p>
+            </div>
+            <input
+              type="search"
+              value="${this.searchQuery}"
+              oninput="App.searchQuery = this.value; App.render();"
+              placeholder="🔍 ابحث عن لعبة..."
+              class="w-full md:w-72 px-4 py-2.5 rounded-2xl border-2 border-slate-200 bg-white font-bold text-sm focus:border-purple-600 outline-none"
+            />
+          </div>
+
+          <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+            ${categories.map(cat => `
+              <button onclick="App.selectedCategory = '${cat}'; App.render();" class="px-4 py-2 rounded-2xl text-xs font-black shrink-0 transition ${this.selectedCategory === cat ? 'bg-purple-700 text-white shadow' : 'bg-white border-2 border-slate-200 text-slate-700'}">
+                ${cat}
+              </button>
+            `).join('')}
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            ${filtered.map(g => this.renderGameCard(g)).join('')}
+          </div>
+        </div>
+      `;
+    };
+
+    App.viewPlans = function () {
+      const activePlans = this.state.plans.filter(p => p.active);
+      return `
+        <div class="space-y-8 fade-in">
+          <div class="text-center max-w-2xl mx-auto space-y-2">
+            <h1 class="text-3xl font-black text-slate-900">💎 باقات الاشتراك</h1>
+            <p class="text-sm text-slate-600 font-bold">اشتراك واحد يفتح جميع الألعاب الـ 30 للعب المحلي وبدون إنترنت. الدفع حصرياً عبر فودافون كاش.</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            ${activePlans.map((p, idx) => `
+              <div class="card-sj p-6 flex flex-col justify-between ${idx === 1 ? 'border-purple-500 ring-4 ring-purple-100' : ''}">
+                <div class="space-y-4">
+                  <span class="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-black">${p.badge}</span>
+                  <h3 class="text-2xl font-black text-slate-900">${p.name}</h3>
+                  <div class="flex items-baseline gap-1">
+                    <span class="text-4xl font-black text-purple-800">${p.price}</span>
+                    <span class="text-sm font-extrabold text-slate-500">ج.م / ${p.durationDays} يوم</span>
+                  </div>
+                  <ul class="space-y-2.5 text-sm font-bold text-slate-700 pt-2 border-t">
+                    ${p.features.map(f => `<li class="flex items-center gap-2"><span class="text-teal-600">✔</span><span>${f}</span></li>`).join('')}
+                  </ul>
+                </div>
+                <button onclick="App.openVodafoneCheckout('${p.id}')" class="btn-3d ${idx === 1 ? 'btn-purple' : 'btn-teal'} w-full py-3.5 rounded-2xl font-black text-base mt-6">
+                  اشتراك عبر فودافون كاش
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    };
+
+    App.viewAccount = function () {
+      const user = this.getCurrentUser();
+      if (!user) {
+        return `
+          <div class="card-sj p-8 text-center max-w-lg mx-auto my-8 space-y-4 fade-in">
+            <div class="text-5xl">👤</div>
+            <h2 class="text-2xl font-black text-slate-900">صفحة حسابي</h2>
+            <p class="text-sm text-slate-600 font-bold">سجّل دخولك أو أنشئ حساباً لمتابعة اشتراكك، طلبات فودافون كاش، نقاطك، وشاراتك.</p>
+            <div class="grid grid-cols-2 gap-3">
+              <button onclick="App.openAuthModal('login')" class="btn-3d btn-purple py-3 rounded-2xl font-black">تسجيل الدخول</button>
+              <button onclick="App.openAuthModal('register')" class="btn-3d btn-teal py-3 rounded-2xl font-black">إنشاء حساب</button>
+            </div>
+          </div>
+        `;
+      }
+
+      const myOrders = this.state.paymentRequests.filter(r => r.userId === user.id);
+      const isSub = this.hasActiveAccess();
+
+      return `
+        <div class="space-y-6 fade-in">
+          <div class="card-sj p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+              <div class="w-16 h-16 rounded-3xl bg-purple-100 border-2 border-purple-300 text-4xl flex items-center justify-center">${user.avatar}</div>
+              <div>
+                <h2 class="text-xl font-black text-slate-900">${user.name}</h2>
+                <div class="text-xs font-bold text-slate-500" dir="ltr">${user.email}</div>
+                <div class="text-xs font-bold text-slate-500 mt-0.5">📍 ${user.city || 'مصر'} • تاريخ الإنشاء: ${user.createdAt}</div>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="App.openEditProfileModal()" class="btn-3d btn-white px-4 py-2.5 rounded-xl text-xs font-black">✏️ تعديل البيانات</button>
+              <button onclick="App.logout()" class="btn-3d btn-rose px-4 py-2.5 rounded-xl text-xs font-black">تسجيل الخروج</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="card-sj p-5 space-y-2">
+              <div class="text-xs font-extrabold text-slate-500">حالة الاشتراك</div>
+              <div class="text-xl font-black ${isSub ? 'text-emerald-700' : 'text-rose-600'}">
+                ${isSub ? '✅ اشتراك نشط' : '❌ غير نشط / منتهٍ'}
+              </div>
+              <div class="text-xs font-bold text-slate-600">الباقة: ${user.subscription.planName}</div>
+              <div class="text-xs font-bold text-slate-500">البدء: ${user.subscription.startDate} • الانتهاء: ${user.subscription.endDate}</div>
+              ${!isSub ? `<button onclick="App.navigate('plans')" class="btn-3d btn-amber w-full py-2 rounded-xl text-xs font-black mt-2">اشتراك / تجديد</button>` : ''}
+            </div>
+
+            <div class="card-sj p-5 space-y-2">
+              <div class="text-xs font-extrabold text-slate-500">النقاط والانتصارات</div>
+              <div class="flex items-center gap-6">
+                <div><div class="text-2xl font-black text-purple-800">${user.stats.points}</div><div class="text-xs font-bold text-slate-500">نقطة</div></div>
+                <div><div class="text-2xl font-black text-amber-600">${user.stats.wins}</div><div class="text-xs font-bold text-slate-500">فوز</div></div>
+                <div><div class="text-2xl font-black text-teal-700">${user.stats.playedGames.length}</div><div class="text-xs font-bold text-slate-500">ألعاب لعبت</div></div>
+              </div>
+            </div>
+
+            <div class="card-sj p-5 space-y-2">
+              <div class="text-xs font-extrabold text-slate-500">الإنجازات والشارات</div>
+              <div class="flex flex-wrap gap-1.5">
+                ${user.stats.achievements.map(a => `<span class="px-2.5 py-1 rounded-xl bg-amber-100 text-amber-900 text-xs font-black">🏅 ${a}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div class="card-sj p-6 space-y-4">
+            <h3 class="text-lg font-black text-slate-900">💳 سجل عمليات الدفع (فودافون كاش)</h3>
+            ${myOrders.length === 0 ? `<p class="text-sm text-slate-500 font-bold">لا توجد طلبات دفع حتى الآن.</p>` : `
+              <div class="space-y-3">
+                ${myOrders.map(o => `
+                  <div class="p-4 rounded-2xl border-2 border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="space-y-1 text-xs font-bold">
+                      <div class="font-black text-sm text-slate-900">${o.planName} — ${o.amount} ج.م (<span dir="ltr">${o.orderId}</span>)</div>
+                      <div class="text-slate-500">التاريخ: ${o.createdAt} • هاتف التحويل: <span dir="ltr">${o.senderPhone}</span></div>
+                      ${o.status === 'rejected' ? `<div class="text-rose-700 font-black">سبب الرفض: ${o.rejectionReason}</div>` : ''}
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-black ${o.status === 'approved' ? 'bg-emerald-100 text-emerald-800' : o.status === 'rejected' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-900'}">
+                      ${o.status === 'approved' ? 'مقبول' : o.status === 'rejected' ? 'مرفوض' : 'قيد المراجعة'}
+                    </span>
+                  </div>
+                `).join('')}
+              </div>
+            `}
+          </div>
+        </div>
+      `;
+    };
+
+    App.viewAbout = function () {
+      return `
+        <div class="card-sj p-6 sm:p-10 max-w-4xl mx-auto space-y-6 fade-in">
+          <div class="text-center space-y-2">
+            <div class="text-5xl">🎲</div>
+            <h1 class="text-3xl font-black text-purple-900">من نحن — ${this.state.siteSettings.platformName}</h1>
+            <p class="text-sm text-slate-500 font-bold">فكرة تجمع العيلة والأصحاب حول شاشة واحدة بدون إنترنت أثناء اللعب</p>
+          </div>
+          <p class="text-slate-700 font-bold leading-relaxed text-base">
+            تهدف منصة <strong>لمّة بلاي</strong> إلى تقديم تجربة ألعاب اجتماعية وعائلية ممتعة وآمنة تعمل على جهاز واحد بالتناوب من 2 إلى 8 لاعبين حسب اللعبة، مع إمكانية تشغيل الألعاب المحفوظة محلياً دون اتصال بالإنترنت بعد تفعيل الاشتراك.
+          </p>
+        </div>
+      `;
+    };
+
+    App.viewLegal = function (type) {
+      const pages = {
+        'legal-terms': {
+          title: '📜 الشروط والأحكام',
+          body: 'يُستخدم الاشتراك العائلي للعب المحلي على جهاز واحد وفق القواعد المعلنة، ويُحظر أي محاولة للتلاعب بصلاحية الاشتراك أو إساءة استخدام المنصة.'
+        },
+        'legal-privacy': {
+          title: '🔒 سياسة الخصوصية',
+          body: 'نحافظ على خصوصية بيانات حسابك وإيصالات التحويل ونستخدمها فقط لإدارة الحساب والتحقق من الاشتراكات وحفظ تقدمك.'
+        },
+        'legal-refund': {
+          title: '💳 سياسة الاشتراكات والاسترداد',
+          body: 'يتم تفعيل الاشتراك بعد مراجعة الإدارة لإثبات تحويل فودافون كاش والتأكد من وصول المبلغ. في حال رفض الطلب يمكن إرسال طلب جديد بالبيانات والإيصال الصحيح.'
+        },
+        'contact': {
+          title: '📞 اتصل بنا',
+          body: `${this.state.siteSettings.contactNote} — البريد الإلكتروني: ${this.state.siteSettings.contactEmail}`
+        }
+      };
+      const p = pages[type] || pages['contact'];
+      return `
+        <div class="card-sj p-6 sm:p-10 max-w-3xl mx-auto space-y-4 fade-in">
+          <h1 class="text-2xl font-black text-purple-900">${p.title}</h1>
+          <p class="text-slate-700 font-bold leading-relaxed">${p.body}</p>
+          <button onclick="App.navigate('home')" class="btn-3d btn-purple px-6 py-2.5 rounded-2xl font-black text-xs">العودة للرئيسية</button>
+        </div>
+      `;
+    };
+
+    App.viewAdmin = function () {
+      const user = this.getCurrentUser();
+      if (!user || user.role !== 'admin') {
+        return `
+          <div class="card-sj p-8 text-center max-w-md mx-auto my-10 space-y-4">
+            <div class="text-5xl">🚫</div>
+            <h2 class="text-xl font-black text-rose-700">لوحة الإدارة محمية للمديرين فقط</h2>
+            <button onclick="App.openAuthModal('login')" class="btn-3d btn-purple px-6 py-3 rounded-2xl font-black text-sm">تسجيل الدخول</button>
+          </div>
+        `;
+      }
+
+      const reqs = this.state.paymentRequests;
+      const pending = reqs.filter(r => r.status === 'pending');
+      const approved = reqs.filter(r => r.status === 'approved');
+      const rejected = reqs.filter(r => r.status === 'rejected');
+      const revenue = approved.reduce((sum, r) => sum + Number(r.amount || 0), 0);
+      const activeSubs = this.state.users.filter(u => u.subscription && u.subscription.status === 'active').length;
+      const expiredSubs = this.state.users.filter(u => u.subscription && u.subscription.status === 'expired').length;
+
+      return `
+        <div class="space-y-6 fade-in">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-black text-slate-900">🛡️ لوحة الإدارة</h1>
+              <p class="text-xs font-bold text-slate-500">مراجعة طلبات فودافون كاش، إدارة المستخدمين، الباقات، الألعاب والأسئلة، وإعدادات الموقع</p>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              ${[
+                ['stats', '📊 الإحصائيات'],
+                ['payments', `💳 طلبات الدفع (${pending.length})`],
+                ['users', '👥 المستخدمون'],
+                ['paySettings', '⚙️ إعدادات فودافون كاش'],
+                ['content', '🎮 الألعاب والأسئلة'],
+                ['site', '🏛️ إعدادات الموقع']
+              ].map(([id, label]) => `
+                <button onclick="App.adminTab = '${id}'; App.render();" class="px-3.5 py-2 rounded-xl text-xs font-black ${this.adminTab === id ? 'bg-slate-900 text-white' : 'bg-white border-2 border-slate-200 text-slate-700'}">
+                  ${label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          ${this.adminTab === 'stats' ? `
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div class="card-sj p-4"><div class="text-xs font-bold text-slate-500">إجمالي المستخدمين</div><div class="text-2xl font-black text-slate-900 mt-1">${this.state.users.length}</div></div>
+              <div class="card-sj p-4"><div class="text-xs font-bold text-slate-500">المشتركون النشطون</div><div class="text-2xl font-black text-emerald-700 mt-1">${activeSubs}</div></div>
+              <div class="card-sj p-4"><div class="text-xs font-bold text-slate-500">الاشتراكات المنتهية</div><div class="text-2xl font-black text-rose-600 mt-1">${expiredSubs}</div></div>
+              <div class="card-sj p-4"><div class="text-xs font-bold text-slate-500">إيرادات العمليات المقبولة</div><div class="text-2xl font-black text-purple-800 mt-1">${revenue} ج.م</div></div>
+              <div class="card-sj p-4"><div class="text-xs font-bold text-slate-500">طلبات قيد المراجعة</div><div class="text-2xl font-black text-amber-600 mt-1">${pending.length}</div></div>
+              <div class="card-sj p-4"><div class="text-xs font-bold text-slate-500">الطلبات المقبولة</div><div class="text-2xl font-black text-teal-700 mt-1">${approved.length}</div></div>
+              <div class="card-sj p-4"><div class="text-xs font-bold text-slate-500">الطلبات المرفوضة</div><div class="text-2xl font-black text-slate-700 mt-1">${rejected.length}</div></div>
+              <div class="card-sj p-4"><div class="text-xs font-bold text-slate-500">الألعاب المفعلة</div><div class="text-2xl font-black text-indigo-700 mt-1">${this.state.games.filter(g => g.active).length}</div></div>
+            </div>
+          ` : ''}
+
+          ${this.adminTab === 'payments' ? `
+            <div class="card-sj p-5 space-y-4 overflow-x-auto">
+              <h3 class="font-black text-lg">💳 جدول طلبات الدفع (فودافون كاش)</h3>
+              ${reqs.length === 0 ? `<p class="text-sm text-slate-500 font-bold">لا توجد طلبات دفع حتى الآن.</p>` : `
+                <table class="w-full text-right text-xs font-bold border-collapse min-w-[680px]">
+                  <thead>
+                    <tr class="border-b-2 border-slate-200 text-slate-500">
+                      <th class="py-2">رقم الطلب</th>
+                      <th>المستخدم</th>
+                      <th>الباقة</th>
+                      <th>المبلغ</th>
+                      <th>هاتف التحويل</th>
+                      <th>المرجع</th>
+                      <th>التاريخ</th>
+                      <th>الحالة</th>
+                      <th>إجراء</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${reqs.map(r => `
+                      <tr class="border-b border-slate-100">
+                        <td class="py-3 font-black" dir="ltr">${r.orderId}</td>
+                        <td>${r.userName}</td>
+                        <td>${r.planName}</td>
+                        <td class="text-emerald-700 font-black">${r.amount} ج.م</td>
+                        <td dir="ltr">${r.senderPhone}</td>
+                        <td dir="ltr">${r.refCode}</td>
+                        <td>${r.createdAt}</td>
+                        <td>
+                          <span class="px-2.5 py-1 rounded-full text-[11px] font-black ${r.status === 'approved' ? 'bg-emerald-100 text-emerald-800' : r.status === 'rejected' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-900'}">
+                            ${r.status === 'approved' ? 'مقبول' : r.status === 'rejected' ? 'مرفوض' : 'قيد المراجعة'}
+                          </span>
+                        </td>
+                        <td>
+                          <button onclick="App.openPaymentReviewModal('${r.orderId}')" class="btn-3d btn-purple px-3 py-1.5 rounded-xl font-black text-[11px]">مراجعة</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              `}
+            </div>
+          ` : ''}
+
+          ${this.adminTab === 'users' ? `
+            <div class="card-sj p-5 space-y-4">
+              <h3 class="font-black text-lg">👥 إدارة المستخدمين والاشتراكات</h3>
+              <div class="space-y-3">
+                ${this.state.users.map(u => `
+                  <div class="p-4 rounded-2xl border-2 border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="text-xs font-bold space-y-0.5">
+                      <div class="font-black text-sm text-slate-900">${u.avatar} ${u.name} (${u.role})</div>
+                      <div class="text-slate-500" dir="ltr">${u.email}</div>
+                      <div>الاشتراك: <strong>${u.subscription.status}</strong> • ينتهي: ${u.subscription.endDate}</div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                      <button onclick="App.adminManualSub('${u.id}', 30)" class="btn-3d btn-teal px-3 py-1.5 rounded-xl text-xs font-black">تفعيل 30 يوم</button>
+                      <button onclick="App.adminStopSub('${u.id}')" class="btn-3d btn-amber px-3 py-1.5 rounded-xl text-xs font-black">إيقاف الاشتراك</button>
+                      ${u.role !== 'admin' ? `<button onclick="App.adminToggleBan('${u.id}')" class="btn-3d btn-rose px-3 py-1.5 rounded-xl text-xs font-black">${u.banned ? 'فك الحظر' : 'حظر الحساب'}</button>` : ''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          ${this.adminTab === 'paySettings' ? `
+            <div class="card-sj p-6 space-y-4">
+              <h3 class="font-black text-lg">⚙️ إعدادات فودافون كاش والباقات</h3>
+              <form onsubmit="App.saveAdminPaymentSettings(event)" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-extrabold text-slate-700 mb-1">رقم فودافون كاش الخاص بالمنصة:</label>
+                  <input id="adminVfNum" value="${this.state.paymentSettings.vodafoneCashNumber}" placeholder="010xxxxxxxx" class="w-full px-4 py-3 rounded-xl border-2 border-red-300 font-black" dir="ltr" />
+                </div>
+                <div>
+                  <label class="block text-xs font-extrabold text-slate-700 mb-1">تعليمات التحويل:</label>
+                  <textarea id="adminVfInst" rows="2" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 font-bold text-sm">${this.state.paymentSettings.instructions}</textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  ${this.state.plans.map(p => `
+                    <div class="p-3 rounded-2xl border-2 border-slate-200 space-y-2">
+                      <div class="font-black text-sm">${p.name}</div>
+                      <label class="block text-[11px] font-bold">السعر (ج.م):
+                        <input id="price_${p.id}" type="number" value="${p.price}" class="w-full mt-1 px-2.5 py-1.5 rounded-lg border font-black" />
+                      </label>
+                      <label class="block text-[11px] font-bold">المدة (أيام):
+                        <input id="days_${p.id}" type="number" value="${p.durationDays}" class="w-full mt-1 px-2.5 py-1.5 rounded-lg border font-black" />
+                      </label>
+                    </div>
+                  `).join('')}
+                </div>
+                <button type="submit" class="btn-3d btn-purple px-6 py-3 rounded-2xl font-black text-sm">حفظ الإعدادات</button>
+              </form>
+            </div>
+          ` : ''}
+
+          ${this.adminTab === 'content' ? `
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div class="card-sj p-5 space-y-3">
+                <h3 class="font-black text-base">➕ إضافة سؤال جديد إلى بنك الأسئلة</h3>
+                <form onsubmit="App.adminAddQuestion(event)" class="space-y-2.5 text-xs font-bold">
+                  <input id="newQCat" required placeholder="التصنيف (ثقافة عامة، علوم، تاريخ، رياضة، أفلام)" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200" />
+                  <input id="newQText" required placeholder="نص السؤال" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200" />
+                  <div class="grid grid-cols-2 gap-2">
+                    <input id="newQOpt0" required placeholder="الاختيار 1" class="px-3 py-2 rounded-xl border" />
+                    <input id="newQOpt1" required placeholder="الاختيار 2" class="px-3 py-2 rounded-xl border" />
+                    <input id="newQOpt2" required placeholder="الاختيار 3" class="px-3 py-2 rounded-xl border" />
+                    <input id="newQOpt3" required placeholder="الاختيار 4" class="px-3 py-2 rounded-xl border" />
+                  </div>
+                  <select id="newQAns" class="w-full px-3 py-2 rounded-xl border-2 border-slate-200 font-black">
+                    <option value="0">الإجابة الصحيحة: الاختيار 1</option>
+                    <option value="1">الإجابة الصحيحة: الاختيار 2</option>
+                    <option value="2">الإجابة الصحيحة: الاختيار 3</option>
+                    <option value="3">الإجابة الصحيحة: الاختيار 4</option>
+                  </select>
+                  <button type="submit" class="btn-3d btn-teal w-full py-2.5 rounded-xl font-black">حفظ السؤال</button>
+                </form>
+              </div>
+
+              <div class="card-sj p-5 space-y-3 max-h-[420px] overflow-y-auto">
+                <h3 class="font-black text-base">🎮 إدارة الألعاب (30 لعبة)</h3>
+                ${this.state.games.map(g => `
+                  <div class="flex items-center justify-between py-2 border-b text-xs font-bold">
+                    <span>${g.icon} ${g.title} (${g.plays} تشغيل)</span>
+                    <button onclick="App.adminToggleGame('${g.id}')" class="px-3 py-1 rounded-lg font-black ${g.active ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                      ${g.active ? 'مفعّلة' : 'موقوفة'}
+                    </button>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          ${this.adminTab === 'site' ? `
+            <div class="card-sj p-6 space-y-4 max-w-xl">
+              <h3 class="font-black text-lg">🏛️ إعدادات الموقع</h3>
+              <form onsubmit="App.saveAdminSiteSettings(event)" class="space-y-3 text-xs font-bold">
+                <div>
+                  <label class="block mb-1">اسم المنصة:</label>
+                  <input id="siteNameIn" value="${this.state.siteSettings.platformName}" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 font-black" />
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input id="siteMaintIn" type="checkbox" ${this.state.siteSettings.maintenanceMode ? 'checked' : ''} class="w-4 h-4" />
+                  <span>تفعيل وضع الصيانة</span>
+                </label>
+                <button type="submit" class="btn-3d btn-purple px-6 py-3 rounded-2xl font-black">حفظ إعدادات الموقع</button>
+              </form>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    };
+
+    /* دوال الإدارة المساعدة */
+    App.adminManualSub = function (userId, days) {
+      const u = this.state.users.find(x => x.id === userId);
+      if (!u) return;
+      const start = new Date();
+      const end = new Date(start.getTime() + days * 24 * 60 * 60 * 1000);
+      u.role = u.role === 'admin' ? 'admin' : 'subscriber';
+      u.subscription = { status: 'active', planName: 'تفعيل إداري', startDate: start.toISOString().split('T')[0], endDate: end.toISOString().split('T')[0] };
+      this.saveState();
+      this.toast(`تم تفعيل اشتراك ${u.name} لمدة ${days} يوماً`, 'teal');
+      this.render();
+    };
+
+    App.adminStopSub = function (userId) {
+      const u = this.state.users.find(x => x.id === userId);
+      if (!u) return;
+      u.subscription.status = 'expired';
+      if (u.role !== 'admin') u.role = 'expired';
+      this.saveState();
+      this.toast(`تم إيقاف اشتراك ${u.name}`, 'amber');
+      this.render();
+    };
+
+    App.adminToggleBan = function (userId) {
+      const u = this.state.users.find(x => x.id === userId);
+      if (!u || u.role === 'admin') return;
+      u.banned = !u.banned;
+      this.saveState();
+      this.toast(u.banned ? 'تم حظر الحساب' : 'تم إلغاء الحظر', 'rose');
+      this.render();
+    };
+
+    App.saveAdminPaymentSettings = function (e) {
+      e.preventDefault();
+      this.state.paymentSettings.vodafoneCashNumber = document.getElementById('adminVfNum').value.trim();
+      this.state.paymentSettings.instructions = document.getElementById('adminVfInst').value.trim();
+      this.state.plans.forEach(p => {
+        p.price = Number(document.getElementById(`price_${p.id}`).value) || p.price;
+        p.durationDays = Number(document.getElementById(`days_${p.id}`).value) || p.durationDays;
+      });
+      this.saveState();
+      this.toast('✅ تم حفظ إعدادات فودافون كاش والباقات', 'teal');
+    };
+
+    App.adminAddQuestion = function (e) {
+      e.preventDefault();
+      this.state.contentBank.quiz.unshift({
+        cat: document.getElementById('newQCat').value.trim(),
+        q: document.getElementById('newQText').value.trim(),
+        opts: [
+          document.getElementById('newQOpt0').value.trim(),
+          document.getElementById('newQOpt1').value.trim(),
+          document.getElementById('newQOpt2').value.trim(),
+          document.getElementById('newQOpt3').value.trim()
+        ],
+        ans: Number(document.getElementById('newQAns').value)
+      });
+      this.saveState();
+      e.target.reset();
+      this.toast('✅ تمت إضافة السؤال الجديد', 'teal');
+    };
+
+    App.adminToggleGame = function (gameId) {
+      const g = this.state.games.find(x => x.id === gameId);
+      if (!g) return;
+      g.active = !g.active;
+      this.saveState();
+      this.render();
+    };
+
+    App.saveAdminSiteSettings = function (e) {
+      e.preventDefault();
+      this.state.siteSettings.platformName = document.getElementById('siteNameIn').value.trim() || this.state.siteSettings.platformName;
+      this.state.siteSettings.maintenanceMode = document.getElementById('siteMaintIn').checked;
+      this.saveState();
+      this.toast('✅ تم حفظ إعدادات الموقع', 'teal');
+      this.render();
+    };
+
+    // تشغيل التطبيق فور تحميل الصفحة
+    window.addEventListener('DOMContentLoaded', () => App.init());
+  </script>
+</body>
+</html>
